@@ -388,14 +388,14 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 						lastregion.put(player.getName(),true);
 					}
 					else {
-						lastregion.put(player.getName(),true);
 						if (checkperm(player,"wrg.notify.greeting")) {
 							if (lastregion.containsKey(player.getName())) {
-								if (lastregion.get(player.getName())) {
+								if (lastregion.get(player.getName())==false) {
 									msg(player,getmsg("MSG21"));
 								}
 							}
 						}
+						lastregion.put(player.getName(),true);
 						//TODO entering worldedit region.
 					}
 					masks.put(player.getName(),player.getWorld().getName());
@@ -406,14 +406,22 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					session.setMask(rm);
 				}
 				else {
-					lastregion.put(player.getName(),false);
+					//TODO check if they are inside cuboid
+					if (lastmask.containsKey(player.getName())) {
+						CuboidRegion cr = (CuboidRegion) lastmask.get(player.getName());
+						Vector v = new Vector(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+						if (cr.contains(v)) {
+							setmask(player,true);
+						}
+					}
 					if (checkperm(player,"wrg.notify.farewell")) {
 						if (lastregion.containsKey(player.getName())) {
-							if (lastregion.get(player.getName())==false) {
+							if (lastregion.get(player.getName())==true) {
 								msg(player,getmsg("MSG22"));
 							}
 						}
 					}
+					lastregion.put(player.getName(),false);
 				}
 			}
 		}
