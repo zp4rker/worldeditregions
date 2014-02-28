@@ -80,6 +80,7 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 	public Map<String, Object> masks = new HashMap<String, Object>();
 	public Map<String, Object> lastmask = new HashMap<String, Object>();
 	public Map<String, String> id = new HashMap<String, String>();
+	public Map<String, Boolean> lastregion = new HashMap<String, Boolean>();
 	
 	public boolean contains(String search,List<String> mylist) {
 		for (String mystr:mylist) {
@@ -330,14 +331,19 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 		if (checkperm(player,"wrg.bypass")==false) {
 			if (remove) {
 				if (id.containsKey(player.getName())==false) {
-					msg(player,getmsg("MSG1")+"&7.");
+					if (checkperm(player,"wrg.notify")) {
+						msg(player,getmsg("MSG1")+"&7.");
+					}
 				}
 				else if ((id.get(player.getName()).equals("~NULL"))==false) {
-					msg(player,getmsg("MSG1")+"&7.");
+					if (checkperm(player,"wrg.notify")) {
+						msg(player,getmsg("MSG1")+"&7.");
+					}
 				}
 				masks.put(player.getName(),"~NULL");
 				lastmask.put(player.getName(),"~NULL");
 				id.put(player.getName(),"~NULL");
+				lastregion.put(player.getName(),false);
 				Vector pos1 = new Vector(Double.MAX_VALUE, 64, Double.MAX_VALUE);
 				Vector pos2 = new Vector(Double.MAX_VALUE, 64, Double.MAX_VALUE);
 				CuboidRegion cr = new CuboidRegion(session.getSelectionWorld(),pos1,pos2);
@@ -372,15 +378,25 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					mymask = ff.getcuboid(player);
 					myid = ff.getid(player);
 				}
-
+				
 				
 				if (mymask != null) {
 					if ((id.get(player.getName()).equals(myid))==false) {
 						msg(player,getmsg("MSG5")+" &a"+myid+"&7.");
 						lastmask.put(player.getName(),mymask);
 						id.put(player.getName(),myid);
+						lastregion.put(player.getName(),true);
 					}
 					else {
+						lastregion.put(player.getName(),true);
+						if (checkperm(player,"wrg.notify.greeting")) {
+							if (lastregion.containsKey(player.getName())) {
+								if (lastregion.get(player.getName())) {
+									msg(player,getmsg("MSG21"));
+								}
+							}
+						}
+						//TODO entering worldedit region.
 					}
 					masks.put(player.getName(),player.getWorld().getName());
 					Vector pos1 = mymask.getMinimumPoint().toBlockPoint();
@@ -388,6 +404,16 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					CuboidRegion cr = new CuboidRegion(session.getSelectionWorld(),pos1,pos2);
 					RegionMask rm = new RegionMask(cr);
 					session.setMask(rm);
+				}
+				else {
+					lastregion.put(player.getName(),false);
+					if (checkperm(player,"wrg.notify.farewell")) {
+						if (lastregion.containsKey(player.getName())) {
+							if (lastregion.get(player.getName())==false) {
+								msg(player,getmsg("MSG22"));
+							}
+						}
+					}
 				}
 			}
 		}
@@ -647,8 +673,6 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 	
 	@EventHandler(priority=EventPriority.LOW, ignoreCancelled=true)
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		
-		msg(event.getPlayer(),getmsg("MSG1"));
 		setmask(event.getPlayer(),true);
 	}
 	@EventHandler
@@ -656,6 +680,7 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 		masks.remove(event.getPlayer().getName());
 		lastmask.remove(event.getPlayer().getName());
 		id.remove(event.getPlayer().getName());
+		lastregion.remove(event.getPlayer().getName());
 	}
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
