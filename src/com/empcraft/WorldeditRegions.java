@@ -726,6 +726,11 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 				catch (Exception e) {
 				}
 			}
+			else {
+				msg(player,"&cToo few arguments.\n/up <block>");
+				event.setCancelled(true);
+				return;
+			}
 		}
 		if (event.getMessage().substring(0, Math.min(event.getMessage().length(), 2)).equals("//")) {
 			boolean operation = false;
