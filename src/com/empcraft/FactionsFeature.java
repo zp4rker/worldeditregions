@@ -72,11 +72,13 @@ public boolean ffCommand(CommandSender sender, Command cmd, String label, String
 		// check if they are the owner
 		if (fac!=null) {
 			if (fac.getOnlinePlayers().contains(player)) {
-				Chunk chunk = player.getLocation().getChunk();
-				Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
-				Vector max = new Vector((chunk.getX() * 16) + 15, 156, (chunk.getZ() * 16)+15);
-				CuboidRegion cuboid = new CuboidRegion(min, max);
-				return cuboid;
+				if (fac.getComparisonName().equals("wilderness")==false) {
+					Chunk chunk = player.getLocation().getChunk();
+					Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
+					Vector max = new Vector((chunk.getX() * 16) + 15, 156, (chunk.getZ() * 16)+15);
+					CuboidRegion cuboid = new CuboidRegion(min, max);
+					return cuboid;
+				}
 			}
 			else {
 			}

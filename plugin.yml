@@ -1,6 +1,6 @@
 name: WorldeditRegions
 main: com.empcraft.WorldeditRegions
-version: 0.2.4
+version: 0.2.7
 depend: [WorldEdit]
 softdepend: [WorldGuard,GriefPrevention,PreciousStones,Towny,Factions,Residence]
 commands:

@@ -34,6 +34,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.WorldEditListener;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.InvalidToolBindException;
 import com.sk89q.worldedit.LocalPlayer;
 import com.sk89q.worldedit.LocalSession;
@@ -41,9 +42,11 @@ import com.sk89q.worldedit.LocalWorld;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.SessionCheck;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.masks.Mask;
 import com.sk89q.worldedit.masks.RegionMask;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.tools.AreaPickaxe;
@@ -183,10 +186,16 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
             msg(null,"Plugin 'Towny' not found. Towny features disabled.");
         }
         Plugin factionsPlugin = getServer().getPluginManager().getPlugin("Factions");
+        Plugin mCorePlugin = getServer().getPluginManager().getPlugin("mcore");
         if((factionsPlugin != null) && factionsPlugin.isEnabled()) {
-        	ff = new FactionsFeature(factionsPlugin,this);
-            getServer().getPluginManager().registerEvents(ff,this);
-            msg(null,"Plugin 'Factions' found. Using it now.");
+        	if (mCorePlugin !=null && mCorePlugin.isEnabled()) {
+	        	ff = new FactionsFeature(factionsPlugin,this);
+	            getServer().getPluginManager().registerEvents(ff,this);
+	            msg(null,"Plugin 'Factions' found. Using it now.");
+        	}
+        	else {
+        		msg(null,"Plugin 'mcore' not found. Factions features disabled.");
+        	}
         } else {
             msg(null,"Plugin 'Factions' not found. Factions features disabled.");
         }
@@ -220,7 +229,7 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
         saveResource("english.yml", true);
         getConfig().options().copyDefaults(true);
         final Map<String, Object> options = new HashMap<String, Object>();
-        getConfig().set("version", "0.2.3");
+        getConfig().set("version", "0.2.7");
         options.put("create.expand-vert",true);
         options.put("language","english");
         options.put("create.add-owner",true);
@@ -354,27 +363,28 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 			else {
 				CuboidRegion mymask = null;
 				String myid = "";
-				if (wgf!=null) {
+				if (wgf!=null&&(checkperm(player,"wrg.worldguard"))) {
 					mymask = wgf.getcuboid(player);
 					myid = wgf.getid(player);
 				}
-				if (gpf!=null&&mymask==null) {
+				if ((gpf!=null&&mymask==null)&&(checkperm(player,"wrg.griefprevention"))) {
 					mymask = gpf.getcuboid(player);
 					myid = gpf.getid(player);
 				}
-				if (rf!=null&&mymask==null) {
+				if ((rf!=null&&mymask==null)&&(checkperm(player,"wrg.residence"))) {
 					mymask = rf.getcuboid(player);
 					myid = rf.getid(player);
 				}
-				if (psf!=null&&mymask==null) {
+				if ((psf!=null&&mymask==null)&&(checkperm(player,"wrg.preciousstones"))) {
 					mymask = psf.getcuboid(player);
 					myid = psf.getid(player);
 				}
-				if (tf!=null&&mymask==null) {
+				
+				if ((tf!=null&&mymask==null)&&(checkperm(player,"wrg.towny"))) {
 					mymask = tf.getcuboid(player);
 					myid = tf.getid(player);
 				}
-				if (ff!=null&&mymask==null) {
+				if ((ff!=null&&mymask==null)&&(checkperm(player,"wrg.factions"))) {
 					mymask = ff.getcuboid(player);
 					myid = ff.getid(player);
 				}
@@ -734,13 +744,6 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 		}
 		if (event.getMessage().substring(0, Math.min(event.getMessage().length(), 2)).equals("//")) {
 			boolean operation = false;
-			
-			
-			
-			
-			
-			
-			
 			if (checkperm(event.getPlayer(),"wrg.bypass")) {
 				return;
 			}
@@ -749,6 +752,40 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+			if (event.getMessage().startsWith("//copy")) {
+				if (checkperm(player,"wrg.copy.bypass")) {
+					return;
+				}
+				if (id.get(player.getName()).equals("~NULL")) {
+					msg(event.getPlayer(),getmsg("MSG1"));
+					event.setCancelled(true);
+					return;
+				}
+				Selection selection = worldedit.getSelection(event.getPlayer());
+				//TODO FSADASS
+				if (selection!=null) {
+					BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
+				    BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
+				    CuboidRegion myregion = (CuboidRegion) lastmask.get(event.getPlayer().getName());
+				    try {
+				    if (myregion==null) {
+				    	msg(event.getPlayer(),getmsg("MSG1"));
+				    }
+				    else {
+				    	if ((myregion.contains(pos1)&&myregion.contains(pos2))==false) {
+				    		msg(event.getPlayer(),getmsg("MSG23"));
+				    	}
+				    	else {
+				    		return;
+				    	}
+				    }
+				    }
+				    catch (Exception e) {
+				    	
+				    }
+				}
+				event.setCancelled(true);
+			}
 			else if (event.getMessage().startsWith("//regen")) {
 				if (id.get(player.getName()).equals("~NULL")) {
 					msg(event.getPlayer(),getmsg("MSG1"));
@@ -756,6 +793,7 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					return;
 				}
 				Selection selection = worldedit.getSelection(event.getPlayer());
+				//TODO FSADASS
 				if (selection!=null) {
 					BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
 				    BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();

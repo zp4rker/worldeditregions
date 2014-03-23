@@ -16,6 +16,7 @@ import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.db.TownyDatabaseHandler;
 import com.palmergames.bukkit.towny.object.Coord;
 import com.palmergames.bukkit.towny.object.PlayerCache;
+import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyUniverse;
@@ -76,7 +77,28 @@ public boolean tfCommand(CommandSender sender, Command cmd, String label, String
 				return null;
 			}
 			else {
+				try {
 				if (myplot.getResident().getName().equals(player.getName())) {
+					Chunk chunk = player.getLocation().getChunk();
+					Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
+					Vector max = new Vector((chunk.getX() * 16) + 15, 256, (chunk.getZ() * 16)+15);
+					CuboidRegion cuboid = new CuboidRegion(min, max);
+					return cuboid;
+				}
+				}
+				catch (Exception e) {
+					
+				}
+				if (plugin.checkperm(player, "wrg.towny.*")) {
+					if (myplot.getTown().hasResident(player.getName())) {
+						Chunk chunk = player.getLocation().getChunk();
+						Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
+						Vector max = new Vector((chunk.getX() * 16) + 15, 256, (chunk.getZ() * 16)+15);
+						CuboidRegion cuboid = new CuboidRegion(min, max);
+						return cuboid;
+					}
+				}
+				else if (myplot.getTown().isMayor(TownyUniverse.getDataSource().getResident(player.getName()))) {
 					Chunk chunk = player.getLocation().getChunk();
 					Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
 					Vector max = new Vector((chunk.getX() * 16) + 15, 256, (chunk.getZ() * 16)+15);
@@ -87,7 +109,6 @@ public boolean tfCommand(CommandSender sender, Command cmd, String label, String
 		}
 		}
 		catch (Exception e) {
-			
 		}
 		return null;
 		
