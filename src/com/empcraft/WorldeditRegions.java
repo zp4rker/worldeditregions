@@ -391,7 +391,9 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 				
 				if (mymask != null) {
 					if ((id.get(player.getName()).equals(myid))==false) {
-						msg(player,getmsg("MSG5")+" &a"+myid+"&7.");
+						if (checkperm(player,"wrg.notify")) {
+							msg(player,getmsg("MSG5")+" &a"+myid+"&7.");
+						}
 						lastmask.put(player.getName(),mymask);
 						id.put(player.getName(),myid);
 						lastregion.put(player.getName(),true);
