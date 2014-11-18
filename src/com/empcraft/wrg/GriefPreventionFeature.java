@@ -1,14 +1,9 @@
-package com.empcraft;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.empcraft.wrg;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,10 +14,7 @@ import org.bukkit.plugin.Plugin;
 
 
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 
@@ -60,10 +52,16 @@ public boolean gpfCommand(CommandSender sender, Command cmd, String label, Strin
 	public CuboidRegion getcuboid(Player player) {
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
 		if (claim!=null) {
+			boolean hasPerm = false;
 			if (claim.getOwnerName().equalsIgnoreCase(player.getName())) {
-				claim.getGreaterBoundaryCorner().getBlockX();
-				Vector min = new Vector(claim.getGreaterBoundaryCorner().getBlockX(), claim.getGreaterBoundaryCorner().getBlockY(), claim.getGreaterBoundaryCorner().getBlockZ());
-				Vector max = new Vector(claim.getLesserBoundaryCorner().getBlockX(), claim.getLesserBoundaryCorner().getBlockY(), claim.getLesserBoundaryCorner().getBlockZ());
+				hasPerm = true;
+			}
+			else if (claim.isManager(player.getName())&&plugin.checkperm(player, "wrg.griefprevention.member")) {
+				hasPerm = true;
+			}
+			if (hasPerm) {
+				Vector max = new Vector(claim.getGreaterBoundaryCorner().getBlockX(), 256, claim.getGreaterBoundaryCorner().getBlockZ());
+				Vector min = new Vector(claim.getLesserBoundaryCorner().getBlockX(), 0, claim.getLesserBoundaryCorner().getBlockZ());
 				CuboidRegion cuboid = new CuboidRegion(min, max);
 				return cuboid;
 			}
@@ -77,7 +75,7 @@ public boolean gpfCommand(CommandSender sender, Command cmd, String label, Strin
 		if (claim==null) {
 			return null;
 		}
-		return "CLAIM:"+claim.toString();
+		return "CLAIM:"+player.getName()+":"+claim.getID();
 	}
 }
 

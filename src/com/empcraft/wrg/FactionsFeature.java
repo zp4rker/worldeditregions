@@ -1,9 +1,5 @@
-package com.empcraft;
+package com.empcraft.wrg;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.command.Command;
@@ -20,8 +16,6 @@ import org.bukkit.plugin.Plugin;
 
 
 
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.entity.Board;
 import com.massivecraft.factions.entity.BoardColls;
 import com.massivecraft.factions.entity.Faction;
 
@@ -29,10 +23,7 @@ import com.massivecraft.factions.entity.Faction;
 
 
 import com.massivecraft.mcore.ps.PS;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 

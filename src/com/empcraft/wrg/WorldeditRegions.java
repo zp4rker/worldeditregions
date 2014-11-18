@@ -1,24 +1,19 @@
-package com.empcraft;
+package com.empcraft.wrg;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -29,56 +24,49 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldedit.bukkit.WorldEditListener;
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.InvalidToolBindException;
-import com.sk89q.worldedit.LocalPlayer;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.LocalWorld;
-import com.sk89q.worldedit.Location;
-import com.sk89q.worldedit.SessionCheck;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldedit.masks.Mask;
-import com.sk89q.worldedit.masks.RegionMask;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.tools.AreaPickaxe;
-import com.sk89q.worldedit.tools.BlockDataCyler;
-import com.sk89q.worldedit.tools.BlockReplacer;
-import com.sk89q.worldedit.tools.BrushTool;
-import com.sk89q.worldedit.tools.DistanceWand;
-import com.sk89q.worldedit.tools.FloatingTreeRemover;
-import com.sk89q.worldedit.tools.FloodFillTool;
-import com.sk89q.worldedit.tools.Tool;
-import com.sk89q.worldedit.tools.TreePlanter;
-import com.sk89q.worldedit.tools.brushes.ButcherBrush;
-import com.sk89q.worldedit.tools.brushes.ClipboardBrush;
-import com.sk89q.worldedit.tools.brushes.CylinderBrush;
-import com.sk89q.worldedit.tools.brushes.GravityBrush;
-import com.sk89q.worldedit.tools.brushes.HollowCylinderBrush;
-import com.sk89q.worldedit.tools.brushes.HollowSphereBrush;
-import com.sk89q.worldedit.tools.brushes.SmoothBrush;
-import com.sk89q.worldedit.tools.brushes.SphereBrush;
+import com.sk89q.worldedit.command.tool.AreaPickaxe;
+import com.sk89q.worldedit.command.tool.BlockDataCyler;
+import com.sk89q.worldedit.command.tool.BlockReplacer;
+import com.sk89q.worldedit.command.tool.BrushTool;
+import com.sk89q.worldedit.command.tool.DistanceWand;
+import com.sk89q.worldedit.command.tool.FloatingTreeRemover;
+import com.sk89q.worldedit.command.tool.FloodFillTool;
+import com.sk89q.worldedit.command.tool.Tool;
+import com.sk89q.worldedit.command.tool.TreePlanter;
+import com.sk89q.worldedit.command.tool.brush.ButcherBrush;
+import com.sk89q.worldedit.command.tool.brush.ClipboardBrush;
+import com.sk89q.worldedit.command.tool.brush.CylinderBrush;
+import com.sk89q.worldedit.command.tool.brush.GravityBrush;
+import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
+import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
+import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
+import com.sk89q.worldedit.command.tool.brush.SphereBrush;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.RegionMask;
 
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public final class WorldeditRegions extends JavaPlugin implements Listener {
+	String version = "0";
 	WorldeditRegions plugin;
 	WorldEditPlugin worldedit = null;
 	WorldguardFeature wgf;
 	FactionsFeature ff;
+	OldFactionsFeature ff2;
 	ResidenceFeature rf;
 	TownyFeature tf;
 	GriefPreventionFeature gpf;
 	PreciousStonesFeature psf;
+	RegiosFeature rgf;
+	VaultFeature vf;
 	
 	public Map<String, Object> masks = new HashMap<String, Object>();
 	public Map<String, Object> lastmask = new HashMap<String, Object>();
@@ -168,22 +156,33 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable(){
 		plugin = this;
+		version = getDescription().getVersion();
+		msg(null,"&8----&9====&7WorldeditRegions v"+version+"&9====&8----");
+		msg(null,"&dby Empire92");
+		
+		Plugin vaultPlugin = getServer().getPluginManager().getPlugin("Vault");
+        if((vaultPlugin != null) && vaultPlugin.isEnabled()) {
+        	vf = new VaultFeature(this, vaultPlugin);
+            msg(null,"&8[&9WRG&8] &7Hooking into Vault");
+        }
 		
 		Plugin worldguardPlugin = getServer().getPluginManager().getPlugin("WorldGuard");
         if((worldguardPlugin != null) && worldguardPlugin.isEnabled()) {
         	wgf = new WorldguardFeature(worldguardPlugin,this);
             getServer().getPluginManager().registerEvents(wgf,this);
-            msg(null,"Plugin 'WorldGuard' found. Using it now.");
-        } else {
-            msg(null,"Plugin 'WorldGuard' not found. Worldguard features disabled.");
+            msg(null,"&8[&9WRG&8] &7Hooking into WorldGuard");
         }
 		Plugin townyPlugin = getServer().getPluginManager().getPlugin("Towny");
         if((townyPlugin != null) && townyPlugin.isEnabled()) {
         	tf = new TownyFeature(townyPlugin,this);
             getServer().getPluginManager().registerEvents(tf,this);
-            msg(null,"Plugin 'Towny' found. Using it now.");
-        } else {
-            msg(null,"Plugin 'Towny' not found. Towny features disabled.");
+            msg(null,"&8[&9WRG&8] &7Hooking into Towny");
+        }
+		Plugin regiosPlugin = getServer().getPluginManager().getPlugin("Regios");
+        if((regiosPlugin != null) && regiosPlugin.isEnabled()) {
+        	rgf = new RegiosFeature(regiosPlugin,this);
+            getServer().getPluginManager().registerEvents(rgf,this);
+            msg(null,"&8[&9WRG&8] &7Hooking into Regios");
         }
         Plugin factionsPlugin = getServer().getPluginManager().getPlugin("Factions");
         Plugin mCorePlugin = getServer().getPluginManager().getPlugin("mcore");
@@ -191,45 +190,37 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
         	if (mCorePlugin !=null && mCorePlugin.isEnabled()) {
 	        	ff = new FactionsFeature(factionsPlugin,this);
 	            getServer().getPluginManager().registerEvents(ff,this);
-	            msg(null,"Plugin 'Factions' found. Using it now.");
+	            msg(null,"&8[&9WRG&8] &7Hooking into Factions");
         	}
         	else {
-        		msg(null,"Plugin 'mcore' not found. Factions features disabled.");
+        	    ff2 = new OldFactionsFeature(factionsPlugin,this);
+                getServer().getPluginManager().registerEvents(ff2,this);
+                msg(null,"&8[&9WRG&8] &7Hooking into Factions (older edition)");
         	}
-        } else {
-            msg(null,"Plugin 'Factions' not found. Factions features disabled.");
         }
         Plugin residencePlugin = getServer().getPluginManager().getPlugin("Residence");
         if((residencePlugin != null) && residencePlugin.isEnabled()) {
         	rf = new ResidenceFeature(residencePlugin,this);
             getServer().getPluginManager().registerEvents(rf,this);
-            msg(null,"Plugin 'Residence' found. Using it now.");
-        } else {
-            msg(null,"Plugin 'Residence' not found. Factions features disabled.");
+            msg(null,"&8[&9WRG&8] &7Hooking into Residence");
         }
         Plugin griefpreventionPlugin = getServer().getPluginManager().getPlugin("GriefPrevention");
         if((griefpreventionPlugin != null) && griefpreventionPlugin.isEnabled()) {
         	gpf = new GriefPreventionFeature(griefpreventionPlugin,this);
             getServer().getPluginManager().registerEvents(gpf,this);
-            msg(null,"Plugin 'GriefPrevention' found. Using it now.");
-        } else {
-            msg(null,"Plugin 'GriefPrevention' not found. GriefPrevention features disabled.");
+            msg(null,"&8[&9WRG&8] &7Hooking into GriefPrevention");
         }
-        
         Plugin preciousstonesPlugin = getServer().getPluginManager().getPlugin("PreciousStones");
         if((preciousstonesPlugin != null) && preciousstonesPlugin.isEnabled()) {
         	psf = new PreciousStonesFeature(preciousstonesPlugin,this);
             getServer().getPluginManager().registerEvents(psf,this);
-            msg(null,"Plugin 'PreciousStones' found. Using it now.");
-        } else {
-            msg(null,"Plugin 'PreciousStones' not found. PreciousStones features disabled.");
+            msg(null,"&8[&9WRG&8] &7Hooking into PreciousStones");
         }
-        
 		worldedit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
         saveResource("english.yml", true);
         getConfig().options().copyDefaults(true);
         final Map<String, Object> options = new HashMap<String, Object>();
-        getConfig().set("version", "0.2.7");
+        getConfig().set("version", version);
         options.put("create.expand-vert",true);
         options.put("language","english");
         options.put("create.add-owner",true);
@@ -263,9 +254,6 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
     			player = (Player) sender;
     		}
     		if (args.length>0) {
-    			//TODO HELP
-    			//TODO Create
-    			//TODO remove
     			String myid = id.get(player.getName());
     			boolean usewg = false;
     			if (args[0].equalsIgnoreCase("create")) {
@@ -287,6 +275,9 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
     			}
     			else if (myid.contains("RESIDENCE:")) {
     				return rf.psfCommand(sender, cmd, label, args);
+    			}
+    			else if (myid.contains("REGIOS:")) {
+    				return rgf.rgsCommand(sender, cmd, label, args);
     			}
     			else {
     				if (wgf!=null) {
@@ -379,7 +370,6 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					mymask = psf.getcuboid(player);
 					myid = psf.getid(player);
 				}
-				
 				if ((tf!=null&&mymask==null)&&(checkperm(player,"wrg.towny"))) {
 					mymask = tf.getcuboid(player);
 					myid = tf.getid(player);
@@ -388,8 +378,19 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					mymask = ff.getcuboid(player);
 					myid = ff.getid(player);
 				}
-				
+				if ((rgf!=null&&mymask==null)&&(checkperm(player,"wrg.regios"))) {
+					mymask = rgf.getcuboid(player);
+					myid = rgf.getid(player);
+				}
+				if ((ff2!=null&&mymask==null)&&(checkperm(player,"wrg.factions"))) {
+                    mymask = ff2.getcuboid(player);
+                    myid = ff2.getid(player);
+                }
 				if (mymask != null) {
+					if (id.containsKey(player.getName())==false) {
+						setmask(player,true);
+						return;
+					}
 					if ((id.get(player.getName()).equals(myid))==false) {
 						if (checkperm(player,"wrg.notify")) {
 							msg(player,getmsg("MSG5")+" &a"+myid+"&7.");
@@ -440,13 +441,15 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 			}
 		}
 		else {
-			session.setMask(null);
-			}
+		    Mask mask = null;
+			session.setMask(mask);
+		}
 			//BYPASSING MASK
 	}
 	
 	
-	@EventHandler(priority=EventPriority.LOWEST)
+	@SuppressWarnings("deprecation")
+    @EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		List<String> disabled = getConfig().getStringList("ignore-worlds");
@@ -656,10 +659,18 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 	}
 	@EventHandler
 	public void onPlayerPortal(PlayerPortalEvent event) {
+		try {
 		if (masks.get(event.getPlayer().getName()).equals(event.getPlayer().getWorld().getName())) {
 			setmask(event.getPlayer(),false);
 		}
 		else {
+			setmask(event.getPlayer(),true);
+			masks.put(event.getPlayer().getName(),"~NULL");
+			lastmask.put(event.getPlayer().getName(),"~NULL");
+			id.put(event.getPlayer().getName(),"~NULL");
+		}
+		}
+		catch (Exception e) {
 			setmask(event.getPlayer(),true);
 			masks.put(event.getPlayer().getName(),"~NULL");
 			lastmask.put(event.getPlayer().getName(),"~NULL");
@@ -669,25 +680,25 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (masks.containsKey(event.getPlayer().getName())) {
-		if (masks.get(event.getPlayer().getName()).equals(event.getPlayer().getWorld().getName())) {
-			setmask(event.getPlayer(),false);
-		}
-		else {
-			setmask(event.getPlayer(),true);
-			masks.put(event.getPlayer().getName(),"~NULL");
-			lastmask.put(event.getPlayer().getName(),"~NULL");
-			id.put(event.getPlayer().getName(),"~NULL");
-			final Player myplayer = event.getPlayer();
-			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-	        scheduler.scheduleSyncDelayedTask(this, new Runnable() {
-
-				@Override
-				public void run() {
-					setmask(myplayer,true);
-					
-				}
-	        }, 20L);
-		}
+			if (masks.get(event.getPlayer().getName()).equals(event.getPlayer().getWorld().getName())) {
+				setmask(event.getPlayer(),false);
+			}
+			else {
+				setmask(event.getPlayer(),true);
+				masks.put(event.getPlayer().getName(),"~NULL");
+				lastmask.put(event.getPlayer().getName(),"~NULL");
+				id.put(event.getPlayer().getName(),"~NULL");
+				final Player myplayer = event.getPlayer();
+				BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		        scheduler.scheduleSyncDelayedTask(this, new Runnable() {
+		
+					@Override
+					public void run() {
+						setmask(myplayer,true);
+						
+					}
+		        }, 20L);
+			}
 		}
 	}
 	
@@ -764,12 +775,11 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					return;
 				}
 				Selection selection = worldedit.getSelection(event.getPlayer());
-				//TODO FSADASS
 				if (selection!=null) {
 					BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
 				    BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
-				    CuboidRegion myregion = (CuboidRegion) lastmask.get(event.getPlayer().getName());
 				    try {
+				    CuboidRegion myregion = (CuboidRegion) lastmask.get(event.getPlayer().getName());
 				    if (myregion==null) {
 				    	msg(event.getPlayer(),getmsg("MSG1"));
 				    }
@@ -795,12 +805,11 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 					return;
 				}
 				Selection selection = worldedit.getSelection(event.getPlayer());
-				//TODO FSADASS
 				if (selection!=null) {
 					BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
 				    BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
-				    CuboidRegion myregion = (CuboidRegion) lastmask.get(event.getPlayer().getName());
 				    try {
+				    CuboidRegion myregion = (CuboidRegion) lastmask.get(event.getPlayer().getName());
 				    if (myregion==null) {
 				    	msg(event.getPlayer(),getmsg("MSG1"));
 				    }
@@ -868,8 +877,8 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 				if (selection!=null) {
 					BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
 				    BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
-				    CuboidRegion myregion = (CuboidRegion) lastmask.get(event.getPlayer().getName());
 				    try {
+				    CuboidRegion myregion = (CuboidRegion) lastmask.get(event.getPlayer().getName());
 				    if (myregion==null) {
 				    	msg(event.getPlayer(),getmsg("MSG1"));
 				    }
@@ -880,7 +889,6 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 				    }
 				}
 				catch (Exception e) {
-					
 				}
 				}
 			}

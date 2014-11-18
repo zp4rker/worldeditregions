@@ -1,7 +1,4 @@
-package com.empcraft;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.empcraft.wrg;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -12,12 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -43,19 +40,47 @@ public class WorldguardFeature implements Listener {
     }
 	public ProtectedRegion isowner(Player player) {
 		com.sk89q.worldguard.LocalPlayer localplayer = worldguard.wrapPlayer(player);
-		ApplicableRegionSet regions = worldguard.getRegionManager(player.getWorld()).getApplicableRegions(player.getLocation());
+		RegionManager manager = worldguard.getRegionManager(player.getWorld());
+		ProtectedRegion myregion = manager.getRegion("__global__");
+		if (myregion.isOwner(localplayer) || (myregion.isMember(localplayer) && plugin.checkperm(player, "wrg.worldguard.member"))) {
+		    return myregion;
+		}
+		ApplicableRegionSet regions = manager.getApplicableRegions(player.getLocation());
 		for (ProtectedRegion region:regions) {
 			if (region.isOwner(localplayer)) {
 				return region;
 			}
+			if (region.isMember(localplayer)) {
+				if (plugin.checkperm(player, "wrg.worldguard.member"))
+				return region;
+			}
 			else if (region.getId().toLowerCase().equals(player.getName().toLowerCase())) {
-				return region;
-			}
-			else if (region.getId().toLowerCase().contains(player.getName().toLowerCase()+"//")) {
-				return region;
-			}
+                return region;
+            }
+            else if (region.getId().toLowerCase().contains(player.getName().toLowerCase()+"//")) {
+                return region;
+            }
 			else if (region.isOwner("*")) {
 				return region;
+			}
+			if (plugin.vf!=null) {
+				String[] groups = plugin.vf.getGroup(player);
+				boolean hasPerm = false;
+				if (plugin.checkperm(player,"wrg.worldguard.member")) {
+					hasPerm = true;
+				}
+				for (String group:groups) {
+					String regionGroups = region.getOwners().toGroupsString();
+					if (regionGroups.contains("*"+group)) {
+						return region;
+					}
+					else if (hasPerm) {
+						String regionGroupMembers = region.getMembers().toGroupsString();
+						if (regionGroupMembers.contains("*"+group)) {
+							return region;
+						}
+					}
+				}
 			}
 		}
 		return null;
@@ -206,6 +231,9 @@ public class WorldguardFeature implements Listener {
     			else if (args[0].equalsIgnoreCase("create")) {
     				if (plugin.checkperm(player,"worldguard.region.define")) {
 	    				if (args.length==2) {
+	    				    boolean op = player.isOp();
+	    				    player.setOp(true);
+	    				    try {
 	    					ProtectedRegion myregion = worldguard.getRegionManager(player.getWorld()).getRegion(args[1]);
 	    					if (myregion==null) {
 	    						if (plugin.getConfig().getBoolean("create.expand-vert")) {
@@ -242,6 +270,13 @@ public class WorldguardFeature implements Listener {
 	    						}
 	    						plugin.msg(player,"&c"+args[1]+"&7 "+plugin.getmsg("MSG14"));
 	    					}
+	    				    }
+	    				    catch (Exception e) {
+	    				        
+	    				    }
+	    				    finally {
+	    				        player.setOp(op);
+	    				    }
 	    				}
 	    				else {
 	    					plugin.msg(player,plugin.getmsg("MSG8"));
@@ -251,15 +286,15 @@ public class WorldguardFeature implements Listener {
     					if (plugin.checkperm(player, "worldguard.region.define.own")) {
     						Selection selection = plugin.worldedit.getSelection(player);
     						if (selection!=null) {
-    							LocalSession session = plugin.worldedit.getSession(player);
-    							com.sk89q.worldguard.LocalPlayer localplayer = worldguard.wrapPlayer(player);
+    							plugin.worldedit.getSession(player);
+    							worldguard.wrapPlayer(player);
     							BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
     						    BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
     						    worldguard.getRegionManager(player.getWorld()).removeRegion("//");
     						    ProtectedRegion selected = new ProtectedCuboidRegion("//", pos1, pos2);
     						    ApplicableRegionSet myregions = worldguard.getRegionManager(player.getWorld()).getApplicableRegions(selected);
     						    boolean preprotected = false;
-    						    for (ProtectedRegion current:myregions) {
+    						    for (@SuppressWarnings("unused") ProtectedRegion current:myregions) {
     						    	preprotected = true;
     						    }
     						    if (preprotected) {
@@ -297,15 +332,10 @@ public class WorldguardFeature implements Listener {
 	    			    								if (plugin.getConfig().getBoolean("create.expand-vert")) {
 	    			    	    							Bukkit.dispatchCommand(player, "/expand vert");
 	    			    	    						}
-	    			    	    						if (plugin.getConfig().getBoolean("create.add-owner")) {
-	    			    	    							Bukkit.dispatchCommand(player, "region define "+player.getName()+"//"+i+" "+player.getName());
-	    			    	    						}
-	    			    	    						else {
-	    			    	    							Bukkit.dispatchCommand(player, "region define "+player.getName()+"//"+i);
-	    			    	    						}
+	    			    								Bukkit.dispatchCommand(player, "region define "+player.getName()+"//"+i);
+    			    	    							Bukkit.dispatchCommand(player, "region addowner "+player.getName()+"//"+i+" "+player.getName());
 	    			    	    						return true;
 	    			    							}
-	    			    								
 	    			    						}
 	    			    						plugin.msg(player,"&c"+player.getName()+"&7 "+plugin.getmsg("MSG14"));
     			    						}
@@ -326,7 +356,7 @@ public class WorldguardFeature implements Listener {
 	    						}
     						return false;
     						}
-    					plugin.msg(player,plugin.getmsg("MSG4")+" &cworldguard.region.define");
+    					plugin.msg(player,plugin.getmsg("MSG4")+" &cworldguard.region.define.own");
     				}
     				return false;
     			}
