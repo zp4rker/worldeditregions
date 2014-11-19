@@ -1,8 +1,8 @@
 name: WorldeditRegions
-main: com.empcraft.WorldeditRegions
-version: 0.2.7
+main: com.empcraft.wrg.WorldeditRegions
+version: 0.2.13
 depend: [WorldEdit]
-softdepend: [WorldGuard,GriefPrevention,PreciousStones,Towny,Factions,Residence]
+softdepend: [Vault,WorldGuard,GriefPrevention,PreciousStones,Towny,Factions,Residence]
 commands:
    wrg:
       description: All Worldedit Regions Commands
