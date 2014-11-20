@@ -54,7 +54,7 @@ public class PlayerListener implements Listener {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
         if (cmd.getName().equalsIgnoreCase("wrg")) {
             if (sender instanceof Player==false) {
-                MainUtil.sendMessage(null, MainUtil.getmsg("MSG0"));
+                MainUtil.sendMessage(null, MainUtil.getMessage("MSG0"));
                 return false;
             }
             Player player = (Player) sender;
@@ -63,7 +63,7 @@ public class PlayerListener implements Listener {
                 return WorldguardFeature.onCommand(sender, cmd, label, args);
             }
             else {
-                MainUtil.sendMessage(player, MainUtil.getmsg("MSG24"));
+                MainUtil.sendMessage(player, MainUtil.getMessage("MSG24"));
                 return true;
             }
         }
@@ -106,7 +106,7 @@ public class PlayerListener implements Listener {
                 }
                 boolean result = RegionHandler.maskManager.cancelBrush(player, loc, region);
                 if (result) {
-                    MainUtil.sendMessage(player, MainUtil.getmsg("MSG20"));
+                    MainUtil.sendMessage(player, MainUtil.getMessage("MSG20"));
                     event.setCancelled(true);
                     return;
                 }
@@ -204,13 +204,13 @@ public class PlayerListener implements Listener {
                     CuboidRegion mymask = RegionHandler.lastmask.get(player.getName());
                     Vector loc = new Vector(player.getLocation().getX(), player.getLocation().getY()+Integer.parseInt(args[1]), player.getLocation().getZ());
                     if (mymask == null || mymask.contains(loc)==false) {
-                        MainUtil.sendMessage(player, MainUtil.getmsg("MSG6"));
+                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG6"));
                         event.setCancelled(true);
                         return;
                     }
                 }
                 else {
-                    MainUtil.sendMessage(player, MainUtil.getmsg("MSG1"));
+                    MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                     event.setCancelled(true);
                     return;
                 }
@@ -228,11 +228,11 @@ public class PlayerListener implements Listener {
                 BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
                 CuboidRegion myregion = RegionHandler.lastmask.get(event.getPlayer().getName());
                 if (myregion==null) {
-                    MainUtil.sendMessage(player, MainUtil.getmsg("MSG1"));
+                    MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                 }
                 else {
                     if ((myregion.contains(pos1) && myregion.contains(pos2))==false) {
-                        MainUtil.sendMessage(player, MainUtil.getmsg("MSG23"));
+                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG23"));
                     }
                     else {
                         return;
@@ -242,7 +242,7 @@ public class PlayerListener implements Listener {
             event.setCancelled(true);
         }
         else if (blocked.contains(start)) {
-            MainUtil.sendMessage(player, MainUtil.getmsg("MSG6"));
+            MainUtil.sendMessage(player, MainUtil.getMessage("MSG6"));
             event.setCancelled(true);
             return;
         }
@@ -255,11 +255,11 @@ public class PlayerListener implements Listener {
                         BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
                         CuboidRegion myregion = RegionHandler.lastmask.get(event.getPlayer().getName());
                         if (myregion==null) {
-                            MainUtil.sendMessage(player, MainUtil.getmsg("MSG1"));
+                            MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                         }
                         else {
                             if ((myregion.contains(pos1) && myregion.contains(pos2))==false) {
-                                MainUtil.sendMessage(player, MainUtil.getmsg("MSG15"));
+                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG15"));
                             }
                         }
                     }

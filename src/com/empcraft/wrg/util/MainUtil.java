@@ -17,8 +17,8 @@ public class MainUtil {
             if (msg.contains("%s")) {
                 String prefix;
                 String suffix;
-                if (!MainUtil.getmsg("ITEM_COLOR").equals("")) {
-                    prefix = MainUtil.getmsg("ITEM_COLOR");
+                if (!MainUtil.getMessage("ITEM_COLOR").equals("")) {
+                    prefix = MainUtil.getMessage("ITEM_COLOR");
                     suffix = ChatColor.getLastColors(msg.substring(0, msg.indexOf("%s")));
                 }
                 else {
@@ -38,7 +38,7 @@ public class MainUtil {
     /**
      * Get message
      */
-    public static String getmsg(String key) {
+    public static String getMessage(String key) {
         return WorldeditRegions.language.getString(key);
     }
 

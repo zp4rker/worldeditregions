@@ -132,7 +132,7 @@ public class WorldguardFeature extends AbstractRegion {
     		Player player;
     		if (sender instanceof Player==false) {
     			player = null;
-    			MainUtil.sendMessage(player,MainUtil.getmsg("MSG0"));
+    			MainUtil.sendMessage(player,MainUtil.getMessage("MSG0"));
     			return false;
     		}
     		else {
@@ -143,13 +143,13 @@ public class WorldguardFeature extends AbstractRegion {
     				if (MainUtil.hasPermission(player,"worldguard.region.addmember.own.*")) {
 	    				if (args.length>1) {
 	    					if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
-	    						MainUtil.sendMessage(player,MainUtil.getmsg("MSG1"));
+	    						MainUtil.sendMessage(player,MainUtil.getMessage("MSG1"));
 	    					}
 	    					else {
 	    						DefaultDomain domain = worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).getMembers();
 	    				        domain.addPlayer(args[1]);
 	    				        worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).setMembers(domain);
-	    				        MainUtil.sendMessage(player,MainUtil.getmsg("MSG2")+" &a"+args[1]+"&7.");
+	    				        MainUtil.sendMessage(player,MainUtil.getMessage("MSG2")+" &a"+args[1]+"&7.");
 	    				        try {
 	    				        	worldguard.getRegionManager(player.getWorld()).save();
     				        	} catch (Exception e) {
@@ -158,11 +158,11 @@ public class WorldguardFeature extends AbstractRegion {
 	    					}
 	    				}
 	    				else {
-	    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG3"));
+	    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG3"));
 	    				}
     				}
     				else {
-    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG4")+" &cworldguard.region.addmember.own.*");
+    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG4")+" &cworldguard.region.addmember.own.*");
     				}
     				return true;
     			}
@@ -170,13 +170,13 @@ public class WorldguardFeature extends AbstractRegion {
     				if (MainUtil.hasPermission(player,"worldguard.region.addowner.own.*")) {
 	    				if (args.length>1) {
 	    					if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
-	    						MainUtil.sendMessage(player,MainUtil.getmsg("MSG1"));
+	    						MainUtil.sendMessage(player,MainUtil.getMessage("MSG1"));
 	    					}
 	    					else {
 	    						DefaultDomain domain = worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).getOwners();
 	    				        domain.addPlayer(args[1]);
 	    				        worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).setOwners(domain);
-	    				        MainUtil.sendMessage(player,MainUtil.getmsg("MSG2")+" &a"+args[1]+"&7.");
+	    				        MainUtil.sendMessage(player,MainUtil.getMessage("MSG2")+" &a"+args[1]+"&7.");
 	    				        try {
 	    				        	worldguard.getRegionManager(player.getWorld()).save();
     				        	} catch (Exception e) {
@@ -185,11 +185,11 @@ public class WorldguardFeature extends AbstractRegion {
 	    					}
 	    				}
 	    				else {
-	    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG11"));
+	    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG11"));
 	    				}
     				}
     				else {
-    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG4")+" &cworldguard.region.addowner.own.*");
+    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG4")+" &cworldguard.region.addowner.own.*");
     				}
     				return true;
     			}
@@ -197,13 +197,13 @@ public class WorldguardFeature extends AbstractRegion {
     				if (MainUtil.hasPermission(player,"worldguard.region.removemember.own.*")) {
 	    				if (args.length>1) {
 	    					if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
-	    						MainUtil.sendMessage(player,MainUtil.getmsg("MSG1"));
+	    						MainUtil.sendMessage(player,MainUtil.getMessage("MSG1"));
 	    					}
 	    					else {
 	    						DefaultDomain domain = worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).getMembers();
 	    				        domain.removePlayer(args[1]);
 	    				        worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).setMembers(domain);
-	    				        MainUtil.sendMessage(player,MainUtil.getmsg("MSG12")+" &c"+args[1]+"&7.");
+	    				        MainUtil.sendMessage(player,MainUtil.getMessage("MSG12")+" &c"+args[1]+"&7.");
 	    				        try {
 	    				        	worldguard.getRegionManager(player.getWorld()).save();
     				        	} catch (Exception e) {
@@ -212,17 +212,17 @@ public class WorldguardFeature extends AbstractRegion {
 	    					}
 	    				}
 	    				else {
-	    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG13"));
+	    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG13"));
 	    				}
     				}
     				else {
-    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG4")+" &cworldguard.region.removemember.own.*");
+    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG4")+" &cworldguard.region.removemember.own.*");
     				}
     				return true;
     			}
     			else if (args[0].equalsIgnoreCase("info")||args[0].equalsIgnoreCase("i")) {
 					if (RegionHandler.id.get(player.getName()).equals("~NULL")) {
-						MainUtil.sendMessage(player,MainUtil.getmsg("MSG1"));
+						MainUtil.sendMessage(player,MainUtil.getMessage("MSG1"));
 					}
 					else {
 						Bukkit.dispatchCommand(player, "region info "+RegionHandler.id.get(player.getName()));
@@ -269,7 +269,7 @@ public class WorldguardFeature extends AbstractRegion {
 	    							}
 	    								
 	    						}
-	    						MainUtil.sendMessage(player,"&c"+args[1]+"&7 "+MainUtil.getmsg("MSG14"));
+	    						MainUtil.sendMessage(player,"&c"+args[1]+"&7 "+MainUtil.getMessage("MSG14"));
 	    					}
 	    				    }
 	    				    catch (Exception e) {
@@ -280,7 +280,7 @@ public class WorldguardFeature extends AbstractRegion {
 	    				    }
 	    				}
 	    				else {
-	    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG8"));
+	    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG8"));
 	    				}
     				}
     				else {
@@ -299,12 +299,12 @@ public class WorldguardFeature extends AbstractRegion {
     						    	preprotected = true;
     						    }
     						    if (preprotected) {
-    						    	MainUtil.sendMessage(player,MainUtil.getmsg("MSG16"));
+    						    	MainUtil.sendMessage(player,MainUtil.getMessage("MSG16"));
     						    }
     						    else {
     						    	double area = (pos1.getX()-pos2.getX())*(pos1.getZ()-pos2.getZ());
     						    	if (area>WorldeditRegions.config.getDouble("max-claim-area")) {
-    						    		MainUtil.sendMessage(player,MainUtil.getmsg("MSG18")+"&7 - "+area + " &c>&7 "+WorldeditRegions.config.getDouble("max-claim-area"));
+    						    		MainUtil.sendMessage(player,MainUtil.getMessage("MSG18")+"&7 - "+area + " &c>&7 "+WorldeditRegions.config.getDouble("max-claim-area"));
     						    	}
     						    	else {
     						    		try {
@@ -338,7 +338,7 @@ public class WorldguardFeature extends AbstractRegion {
 	    			    	    						return true;
 	    			    							}
 	    			    						}
-	    			    						MainUtil.sendMessage(player,"&c"+player.getName()+"&7 "+MainUtil.getmsg("MSG14"));
+	    			    						MainUtil.sendMessage(player,"&c"+player.getName()+"&7 "+MainUtil.getMessage("MSG14"));
     			    						}
     						    		}
 			    						catch (Exception e) {
@@ -353,23 +353,23 @@ public class WorldguardFeature extends AbstractRegion {
     						    worldguard.getRegionManager(player.getWorld()).removeRegion("//");
 	    						}
 	    						else {
-	    							MainUtil.sendMessage(player,MainUtil.getmsg("MSG17"));
+	    							MainUtil.sendMessage(player,MainUtil.getMessage("MSG17"));
 	    						}
     						return false;
     						}
-    					MainUtil.sendMessage(player,MainUtil.getmsg("MSG4")+" &cworldguard.region.define.own");
+    					MainUtil.sendMessage(player,MainUtil.getMessage("MSG4")+" &cworldguard.region.define.own");
     				}
     				return false;
     			}
     			else if (args[0].equalsIgnoreCase("help")) {
-    				MainUtil.sendMessage(player,MainUtil.getmsg("MSG7"));
+    				MainUtil.sendMessage(player,MainUtil.getMessage("MSG7"));
     				return true;
     			}
     			else if (args[0].equalsIgnoreCase("remove")) {
 					if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
-						MainUtil.sendMessage(player,MainUtil.getmsg("MSG1"));
+						MainUtil.sendMessage(player,MainUtil.getMessage("MSG1"));
 						if (MainUtil.hasPermission(player,"worldguard.region.remove.*")) {
-							MainUtil.sendMessage(player,MainUtil.getmsg("MSG9"));
+							MainUtil.sendMessage(player,MainUtil.getMessage("MSG9"));
 						}
 					}
 					else {
@@ -377,7 +377,7 @@ public class WorldguardFeature extends AbstractRegion {
 							Bukkit.dispatchCommand(player, "region remove "+RegionHandler.lastmask.get(player.getName()));
 						}					
 						else {
-							MainUtil.sendMessage(player,MainUtil.getmsg("MSG4")+" &cworldguard.region.remove.own.*");
+							MainUtil.sendMessage(player,MainUtil.getMessage("MSG4")+" &cworldguard.region.remove.own.*");
 						}
 					}
 					return true;
@@ -387,9 +387,9 @@ public class WorldguardFeature extends AbstractRegion {
     				if (args.length==2) {
     					if (MainUtil.hasPermission(player,"worldguard.region.flag.regions.own."+args[0])) {
     						if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
-    							MainUtil.sendMessage(player,MainUtil.getmsg("MSG1"));
+    							MainUtil.sendMessage(player,MainUtil.getMessage("MSG1"));
     							if (MainUtil.hasPermission(player,"worldguard.region.flag.regions.*")) {
-    								MainUtil.sendMessage(player,MainUtil.getmsg("MSG10"));
+    								MainUtil.sendMessage(player,MainUtil.getMessage("MSG10"));
     							}
     						}
     						else {
@@ -397,7 +397,7 @@ public class WorldguardFeature extends AbstractRegion {
     						}
     					}
     					else {
-    						MainUtil.sendMessage(player,MainUtil.getmsg("MSG4")+" &cworldguard.region.flag.regions.own."+args[0]);
+    						MainUtil.sendMessage(player,MainUtil.getMessage("MSG4")+" &cworldguard.region.flag.regions.own."+args[0]);
     					}
     					return true;
     				}

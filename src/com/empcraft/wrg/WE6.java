@@ -66,7 +66,7 @@ public class WE6 extends AbsWE {
              || brush instanceof CylinderBrush
              || brush instanceof ClipboardBrush
              || brush instanceof BrushTool) {
-                MainUtil.sendMessage(player, MainUtil.getmsg("MSG15"));
+                MainUtil.sendMessage(player, MainUtil.getMessage("MSG15"));
             }
         }
         return false;
