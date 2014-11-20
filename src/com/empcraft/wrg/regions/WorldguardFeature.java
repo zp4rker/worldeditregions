@@ -47,7 +47,7 @@ public class WorldguardFeature extends AbstractRegion {
 		com.sk89q.worldguard.LocalPlayer localplayer = worldguard.wrapPlayer(player);
 		RegionManager manager = worldguard.getRegionManager(player.getWorld());
 		ProtectedRegion myregion = manager.getRegion("__global__");
-		if (myregion.isOwner(localplayer) || (myregion.isMember(localplayer) && MainUtil.hasPermission(player, "wrg.worldguard.member"))) {
+		if (myregion != null && (myregion.isOwner(localplayer) || (myregion.isMember(localplayer) && MainUtil.hasPermission(player, "wrg.worldguard.member")))) {
 		    return myregion;
 		}
 		ApplicableRegionSet regions = manager.getApplicableRegions(player.getLocation());
