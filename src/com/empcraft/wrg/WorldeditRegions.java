@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.empcraft.wrg.listener.PlayerListener;
 import com.empcraft.wrg.regions.FactionsFeature;
 import com.empcraft.wrg.regions.GriefPreventionFeature;
 import com.empcraft.wrg.regions.OldFactionsFeature;
@@ -173,7 +174,7 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
         }
     	saveConfig();
     	this.saveDefaultConfig();
-    	getServer().getPluginManager().registerEvents(this, this);   
+    	getServer().getPluginManager().registerEvents(new PlayerListener(), this);   
 		for (Player player:Bukkit.getOnlinePlayers()) {
 		    RegionHandler.refreshPlayer(player);
 		    RegionHandler.setMask(player, false);
