@@ -1,4 +1,4 @@
-package com.empcraft.wrg;
+package com.empcraft.wrg.regions;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -14,13 +14,22 @@ import org.bukkit.plugin.Plugin;
 
 
 
+
+
+
+
+
+import com.empcraft.wrg.WorldeditRegions;
+import com.empcraft.wrg.object.AbstractRegion;
+import com.empcraft.wrg.object.CuboidRegionWrapper;
+import com.empcraft.wrg.util.MainUtil;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 
 
 
-public class GriefPreventionFeature implements Listener {
+public class GriefPreventionFeature extends AbstractRegion   {
 	Plugin griefprevention;
 	WorldeditRegions plugin;
 	public GriefPreventionFeature(Plugin griefpreventionplugin,WorldeditRegions worldeditregions) {
@@ -28,54 +37,34 @@ public class GriefPreventionFeature implements Listener {
     	plugin = worldeditregions;
     	
     }
-public boolean gpfCommand(CommandSender sender, Command cmd, String label, String[] args){
-    	if (cmd.getName().equalsIgnoreCase("wrg")) {
-    		Player player;
-    		if (sender instanceof Player==false) {
-    			player = null;
-    			plugin.msg(player,plugin.getmsg("MSG0"));
-    			return false;
-    		}
-    		else {
-    			player = (Player) sender;
-    		}
-    		if (args.length>0) {
-    			if (args[0].equalsIgnoreCase("help")) {
-    				plugin.msg(player,plugin.getmsg("MSG7"));
-    				return true;
-    			}
-    		}
-    		Bukkit.dispatchCommand(player,"wrg help");
-    	}
-		return false;
-	}
-	public CuboidRegion getcuboid(Player player) {
+
+	@Override
+	public CuboidRegionWrapper getcuboid(Player player) {
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
 		if (claim!=null) {
 			boolean hasPerm = false;
 			if (claim.getOwnerName().equalsIgnoreCase(player.getName())) {
 				hasPerm = true;
 			}
-			else if (claim.isManager(player.getName())&&plugin.checkperm(player, "wrg.griefprevention.member")) {
+			else if (claim.isManager(player.getName())&& MainUtil.hasPermission(player, "wrg.griefprevention.member")) {
 				hasPerm = true;
 			}
 			if (hasPerm) {
 				Vector max = new Vector(claim.getGreaterBoundaryCorner().getBlockX(), 256, claim.getGreaterBoundaryCorner().getBlockZ());
 				Vector min = new Vector(claim.getLesserBoundaryCorner().getBlockX(), 0, claim.getLesserBoundaryCorner().getBlockZ());
 				CuboidRegion cuboid = new CuboidRegion(min, max);
-				return cuboid;
+				
+				return new CuboidRegionWrapper(cuboid, "CLAIM:"+player.getName()+":"+claim.getID());
 			}
 		}
 		return null;
 		
 		
 	}
-	public String getid(Player player) {
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
-		if (claim==null) {
-			return null;
-		}
-		return "CLAIM:"+player.getName()+":"+claim.getID();
-	}
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return MainUtil.hasPermission(player, "wrg.griefprevention");
+    }
 }
 

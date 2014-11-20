@@ -1,4 +1,4 @@
-package com.empcraft.wrg;
+package com.empcraft.wrg.regions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -16,6 +16,15 @@ import org.bukkit.plugin.Plugin;
 
 
 
+
+
+
+
+
+import com.empcraft.wrg.WorldeditRegions;
+import com.empcraft.wrg.object.AbstractRegion;
+import com.empcraft.wrg.object.CuboidRegionWrapper;
+import com.empcraft.wrg.util.MainUtil;
 import com.massivecraft.factions.entity.BoardColls;
 import com.massivecraft.factions.entity.Faction;
 
@@ -29,7 +38,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 
 
 
-public class FactionsFeature implements Listener {
+public class FactionsFeature extends AbstractRegion   {
 	Plugin factions;
 	WorldeditRegions plugin;
 	public FactionsFeature(Plugin factionsplugin,WorldeditRegions worldeditregions) {
@@ -37,28 +46,9 @@ public class FactionsFeature implements Listener {
     	plugin = worldeditregions;
     	
     }
-public boolean ffCommand(CommandSender sender, Command cmd, String label, String[] args){
-    	if (cmd.getName().equalsIgnoreCase("wrg")) {
-    		Player player;
-    		if (sender instanceof Player==false) {
-    			player = null;
-    			plugin.msg(player,plugin.getmsg("MSG0"));
-    			return false;
-    		}
-    		else {
-    			player = (Player) sender;
-    		}
-    		if (args.length>0) {
-    			if (args[0].equalsIgnoreCase("help")) {
-    				plugin.msg(player,plugin.getmsg("MSG7"));
-    				return true;
-    			}
-    		}
-    		Bukkit.dispatchCommand(player,"wrg help");
-    	}
-		return false;
-	}
-	public CuboidRegion getcuboid(Player player) {
+	
+	@Override
+	public CuboidRegionWrapper getcuboid(Player player) {
 		Faction fac = BoardColls.get().getFactionAt(PS.valueOf(player.getLocation()));
 		// check if they are the owner
 		if (fac!=null) {
@@ -68,7 +58,7 @@ public boolean ffCommand(CommandSender sender, Command cmd, String label, String
 					Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
 					Vector max = new Vector((chunk.getX() * 16) + 15, 156, (chunk.getZ() * 16)+15);
 					CuboidRegion cuboid = new CuboidRegion(min, max);
-					return cuboid;
+					return new CuboidRegionWrapper(cuboid, "CHUNK:"+chunk.getX()+","+chunk.getZ());
 				}
 			}
 			else {
@@ -81,8 +71,10 @@ public boolean ffCommand(CommandSender sender, Command cmd, String label, String
 		
 		
 	}
-	public String getid(Player player) {
-		return "CHUNK:"+player.getLocation().getChunk().getX()+","+player.getLocation().getChunk().getZ();
-	}
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return MainUtil.hasPermission(player, "wrg.factions");
+    }
 }
 

@@ -1,6 +1,7 @@
-package com.empcraft.wrg;
+package com.empcraft.wrg.regions;
 
 import java.util.ArrayList;
+
 import net.jzx7.regiosapi.RegiosAPI;
 import net.jzx7.regiosapi.location.RegiosPoint;
 import net.jzx7.regiosapi.regions.CuboidRegion;
@@ -12,9 +13,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import com.empcraft.wrg.WorldeditRegions;
+import com.empcraft.wrg.object.AbstractRegion;
+import com.empcraft.wrg.object.CuboidRegionWrapper;
+import com.empcraft.wrg.util.MainUtil;
 import com.sk89q.worldedit.Vector;
 
-public class RegiosFeature implements Listener {
+public class RegiosFeature extends AbstractRegion   {
 	RegiosAPI regios;
 	WorldeditRegions plugin;
 	public RegiosFeature(Plugin regiosPlugin,WorldeditRegions worldeditregions) {
@@ -22,10 +27,8 @@ public class RegiosFeature implements Listener {
     	plugin = worldeditregions;
     	
     }
-	public boolean rgsCommand(CommandSender sender, Command cmd, String label, String[] args){
-		return false;
-	}
-	public com.sk89q.worldedit.regions.CuboidRegion getcuboid(Player player) {
+
+	public CuboidRegionWrapper getcuboid(Player player) {
 		ArrayList<Region> regions = regios.getRegions(player.getLocation());
 		for (Region region:regions) {
 			boolean toReturn = false;
@@ -35,7 +38,7 @@ public class RegiosFeature implements Listener {
 			else if (region.getName().equals(player.getName())) {
 				toReturn = true;
 			}
-			else if (plugin.checkperm(player, "wrg.regios.member")) {
+			else if (MainUtil.hasPermission(player, "wrg.regios.member")) {
 				ArrayList<String> players = region.getPlayersInRegion();
 				for (String user:players) {
 					if (user.equals(player.getName())) {
@@ -51,7 +54,8 @@ public class RegiosFeature implements Listener {
 					RegiosPoint pos2 = cRegion.getL2();
 					Vector min = new Vector(pos1.getX(),pos1.getY(),pos1.getZ());
 					Vector max = new Vector(pos2.getX(),pos2.getY(),pos2.getZ());
-					return new com.sk89q.worldedit.regions.CuboidRegion(min, max);
+					com.sk89q.worldedit.regions.CuboidRegion cuboid = new com.sk89q.worldedit.regions.CuboidRegion(min, max);
+					return new CuboidRegionWrapper(cuboid, "REGIOS:"+region.getName());
 				}
 			}
 		}
@@ -66,7 +70,7 @@ public class RegiosFeature implements Listener {
 			else if (region.getName().equals(player.getName())) {
 				return "REGIOS:"+region.getName();
 			}
-			else if (plugin.checkperm(player, "wrg.regios.member")) {
+			else if (MainUtil.hasPermission(player, "wrg.regios.member")) {
 				ArrayList<String> players = region.getPlayersInRegion();
 				for (String user:players) {
 					if (user.equals(player.getName())) {
@@ -77,5 +81,10 @@ public class RegiosFeature implements Listener {
 		}
 		return null;
 	}
+	
+	@Override
+    public boolean hasPermission(Player player) {
+        return MainUtil.hasPermission(player, "wrg.regios");
+    }
 }
 

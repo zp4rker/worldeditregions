@@ -1,4 +1,4 @@
-package com.empcraft.wrg;
+package com.empcraft.wrg.regions;
 
 import org.bukkit.Chunk;
 import org.bukkit.command.Command;
@@ -7,6 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import com.empcraft.wrg.WorldeditRegions;
+import com.empcraft.wrg.object.AbstractRegion;
+import com.empcraft.wrg.object.CuboidRegionWrapper;
+import com.empcraft.wrg.util.MainUtil;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.PlayerCache;
 import com.palmergames.bukkit.towny.object.TownBlock;
@@ -18,7 +22,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 
 
 
-public class TownyFeature implements Listener {
+public class TownyFeature extends AbstractRegion   {
 	Plugin towny;
 	WorldeditRegions plugin;
 	public TownyFeature(Plugin townyplugin,WorldeditRegions worldeditregions) {
@@ -26,10 +30,9 @@ public class TownyFeature implements Listener {
     	plugin = worldeditregions;
     	
     }
-public boolean tfCommand(CommandSender sender, Command cmd, String label, String[] args){
-		return false;
-	}
-	public CuboidRegion getcuboid(Player player) {
+	
+	@Override
+	public CuboidRegionWrapper getcuboid(Player player) {
 		try {
 		PlayerCache cache = ((Towny) towny).getCache(player);
 		WorldCoord mycoord = cache.getLastTownBlock();
@@ -48,19 +51,19 @@ public boolean tfCommand(CommandSender sender, Command cmd, String label, String
 					Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
 					Vector max = new Vector((chunk.getX() * 16) + 15, 256, (chunk.getZ() * 16)+15);
 					CuboidRegion cuboid = new CuboidRegion(min, max);
-					return cuboid;
+					return new CuboidRegionWrapper(cuboid, "PLOT:"+chunk.getX()+","+chunk.getZ());
 				}
 				}
 				catch (Exception e) {
 					
 				}
-				if (plugin.checkperm(player, "wrg.towny.member")) {
+				if (MainUtil.hasPermission(player, "wrg.towny.member")) {
 					if (myplot.getTown().hasResident(player.getName())) {
 						Chunk chunk = player.getLocation().getChunk();
 						Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
 						Vector max = new Vector((chunk.getX() * 16) + 15, 256, (chunk.getZ() * 16)+15);
 						CuboidRegion cuboid = new CuboidRegion(min, max);
-						return cuboid;
+						return new CuboidRegionWrapper(cuboid, "PLOT:"+chunk.getX()+","+chunk.getZ());
 					}
 				}
 				else if (myplot.getTown().isMayor(TownyUniverse.getDataSource().getResident(player.getName()))) {
@@ -68,7 +71,7 @@ public boolean tfCommand(CommandSender sender, Command cmd, String label, String
 					Vector min = new Vector(chunk.getX() * 16, 0, chunk.getZ() * 16);
 					Vector max = new Vector((chunk.getX() * 16) + 15, 256, (chunk.getZ() * 16)+15);
 					CuboidRegion cuboid = new CuboidRegion(min, max);
-					return cuboid;
+					return new CuboidRegionWrapper(cuboid, "PLOT:"+chunk.getX()+","+chunk.getZ());
 				}
 			}
 		}
@@ -79,8 +82,10 @@ public boolean tfCommand(CommandSender sender, Command cmd, String label, String
 		
 		
 	}
-	public String getid(Player player) {
-		return "PLOT:"+player.getLocation().getChunk().getX()+","+player.getLocation().getChunk().getZ();
-	}
+	
+	@Override
+    public boolean hasPermission(Player player) {
+        return MainUtil.hasPermission(player, "wrg.towny");
+    }
 }
 
