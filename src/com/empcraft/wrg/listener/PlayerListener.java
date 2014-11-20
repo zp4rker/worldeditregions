@@ -155,6 +155,7 @@ public class PlayerListener implements Listener {
     public static void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         RegionHandler.refreshPlayer(player);
+        RegionHandler.setMask(player, false);
     }
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
@@ -162,7 +163,12 @@ public class PlayerListener implements Listener {
     }
     @EventHandler
     public static void onPlayerMove(PlayerMoveEvent event) {
-        RegionHandler.setMask(event.getPlayer(),false);
+        Location f = event.getFrom();
+        Location t = event.getTo();
+        
+        if (f.getBlockX() != t.getBlockX() || f.getBlockZ() != t.getBlockZ() || f.getBlockY() != t.getBlockY()) {
+            RegionHandler.setMask(event.getPlayer(),false);
+        }
     }
     @EventHandler(priority=EventPriority.LOWEST, ignoreCancelled=true)
     public static void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {

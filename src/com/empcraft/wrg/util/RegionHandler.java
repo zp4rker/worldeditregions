@@ -66,7 +66,6 @@ public class RegionHandler {
     
     public static void setMask(Player player, boolean remove) {
         LocalSession session = WorldeditRegions.worldedit.getSession(player);
-
         if (RegionHandler.disabled.contains(player.getWorld().getName())) {
             return;
         }
@@ -76,6 +75,7 @@ public class RegionHandler {
         if (RegionHandler.bypass.contains(name)) {
             return;
         }
+        
         
         if (remove) {
             if (id.containsKey(name) && (id.get(name)) != null) {
@@ -101,7 +101,7 @@ public class RegionHandler {
             }
             if (myMask != null) {
                 if (id.containsKey(name) && lastregion.containsKey(name)) {
-                    if (id.get(name).equals(id)) {
+                    if (id.get(name).equals(id) && id.get(name) != null) {
                         if (!lastregion.get(name)) {
                             if (MainUtil.hasPermission(player,"wrg.notify.greeting")) {
                                 MainUtil.sendMessage(player, MainUtil.getmsg("MSG21"), myID);
@@ -123,13 +123,6 @@ public class RegionHandler {
                 maskManager.setMask(player, cr);
             }
             else {
-                if (lastmask.containsKey(name)) {
-                    if (lastmask.get(name) != null) {
-                        if (MainUtil.hasPermission(player, "wrg.notify.farewell")) {
-                            MainUtil.sendMessage(player, MainUtil.getmsg("MSG22"));
-                        }
-                    }
-                }
                 if (id.containsKey(name) && lastregion.containsKey(name)) {
                     if (id.get(name).equals(id)) {
                         if (lastregion.get(name)) {
@@ -140,9 +133,11 @@ public class RegionHandler {
                         return;
                     }
                 }
-                lastregion.put(name,false);
-                CuboidRegion cr = new CuboidRegion(session.getSelectionWorld(),new Vector(69,69,69),new Vector(69,69,69));
-                maskManager.setMask(player, cr);
+                else {
+                    lastregion.put(name,false);
+                    CuboidRegion cr = new CuboidRegion(session.getSelectionWorld(),new Vector(69,69,69),new Vector(69,69,69));
+                    maskManager.setMask(player, cr);
+                }
             }
         }
     }

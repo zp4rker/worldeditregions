@@ -14,6 +14,7 @@ import com.empcraft.wrg.util.MainUtil;
 import com.empcraft.wrg.util.RegionHandler;
 import com.empcraft.wrg.util.VaultHandler;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -48,7 +49,9 @@ public class WorldguardFeature extends AbstractRegion {
 		RegionManager manager = worldguard.getRegionManager(player.getWorld());
 		ProtectedRegion myregion = manager.getRegion("__global__");
 		if (myregion != null && (myregion.isOwner(localplayer) || (myregion.isMember(localplayer) && MainUtil.hasPermission(player, "wrg.worldguard.member")))) {
-		    return myregion;
+		    BlockVector pt1 = new BlockVector(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
+		    BlockVector pt2 = new BlockVector(Integer.MAX_VALUE, 256, Integer.MAX_VALUE);
+		    return new ProtectedCuboidRegion("__global__-"+player.getWorld().getName(), pt1, pt2);
 		}
 		ApplicableRegionSet regions = manager.getApplicableRegions(player.getLocation());
 		for (ProtectedRegion region:regions) {
