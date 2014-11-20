@@ -27,7 +27,7 @@ public class MainUtil {
                 }
                 for (final String s : args) {
                     if (msg.contains("%s")) {
-                        msg = msg.replaceFirst(prefix+"%s"+suffix, s);
+                        msg = msg.replaceFirst("%s", prefix+s+suffix);
                     }
                 }
             }
