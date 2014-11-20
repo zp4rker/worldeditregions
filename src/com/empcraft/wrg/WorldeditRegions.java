@@ -94,9 +94,6 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 	public void onEnable(){
 		plugin = this;
 		version = getDescription().getVersion();
-		File yamlFile = new File(getDataFolder(), getConfig().getString("language").toLowerCase()+".yml");
-		language = YamlConfiguration.loadConfiguration(yamlFile);
-		config = getConfig();
 		
 		RegionHandler.disabled.addAll(config.getStringList("ignore-worlds"));
 		
@@ -183,6 +180,10 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
 		    RegionHandler.refreshPlayer(player);
 		    RegionHandler.setMask(player, false);
 		}
+		
+		File yamlFile = new File(getDataFolder(), getConfig().getString("language").toLowerCase()+".yml");
+        language = YamlConfiguration.loadConfiguration(yamlFile);
+        config = getConfig();
 	}
 	
 }
