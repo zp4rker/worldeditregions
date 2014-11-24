@@ -1,6 +1,7 @@
 package com.empcraft.wrg.regions;
 
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -44,28 +45,28 @@ public class OldFactionsFeature extends AbstractRegion {
 
                 chunkSelection = new LocPair(locs.xmax + 1, locs.ymin, locs.xmax + 1, locs.ymax);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(0, 0, 1, 0);
                     hasPerm = true;
                 }
 
                 chunkSelection = new LocPair(locs.xmin - 1, locs.ymin, locs.xmin - 1, locs.ymax);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(-1, 0, 0, 0);
                     hasPerm = true;
                 }
 
                 chunkSelection = new LocPair(locs.xmin, locs.ymax + 1, locs.xmax, locs.ymax + 1);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(0, 0, 0, 1);
                     hasPerm = true;
                 }
 
                 chunkSelection = new LocPair(locs.xmin, locs.ymin - 1, locs.xmax, locs.ymin - 1);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(0, -1, 0, 0);
                     hasPerm = true;
                 }
@@ -82,16 +83,16 @@ public class OldFactionsFeature extends AbstractRegion {
         for (int x = locs.xmin; x <= locs.xmax; x++) {
             for (int y = locs.ymin; y <= locs.ymax; y++) {
 
-                final FLocation loc = new FLocation(player.getLocation());
+                final FLocation loc = new FLocation(new Location(world, x << 4, 0, y << 4));
                 final Faction fac = Board.getFactionAt(loc);
 
-                if ((fac == null) || fac.isNone() || fac.isSafeZone() || fac.isWarZone()) {
+                if (((fac == null) || fac.isNone() || fac.isSafeZone()) && (!fac.getId().equals("0"))) {
                     return false;
                 }
                 if (!fac.getOnlinePlayers().contains(player)) {
                     return false;
                 }
-                if (fac.isPlayerFreeType() && !perm) {
+                if (fac.getId().equals("0") && !perm) {
                     return false;
                 }
             }

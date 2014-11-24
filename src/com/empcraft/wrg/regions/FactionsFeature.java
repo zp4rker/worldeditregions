@@ -46,28 +46,28 @@ public class FactionsFeature extends AbstractRegion {
 
                 chunkSelection = new LocPair(locs.xmax + 1, locs.ymin, locs.xmax + 1, locs.ymax);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(0, 0, 1, 0);
                     hasPerm = true;
                 }
 
                 chunkSelection = new LocPair(locs.xmin - 1, locs.ymin, locs.xmin - 1, locs.ymax);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(-1, 0, 0, 0);
                     hasPerm = true;
                 }
 
                 chunkSelection = new LocPair(locs.xmin, locs.ymax + 1, locs.xmax, locs.ymax + 1);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(0, 0, 0, 1);
                     hasPerm = true;
                 }
 
                 chunkSelection = new LocPair(locs.xmin, locs.ymin - 1, locs.xmax, locs.ymin - 1);
 
-                if (isAdded(chunkSelection, world, player, hasPerm)) {
+                if (isAdded(chunkSelection, world, player, perm)) {
                     locs.add(0, -1, 0, 0);
                     hasPerm = true;
                 }
