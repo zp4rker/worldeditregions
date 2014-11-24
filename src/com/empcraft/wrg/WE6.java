@@ -29,47 +29,33 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 public class WE6 extends AbsWE {
 
     @Override
-    public void setMask(Player player, CuboidRegion region) {
-        RegionMask mask = new RegionMask(region);
-        LocalSession session = WorldeditRegions.worldedit.getSession(player);
+    public void setMask(final Player player, final CuboidRegion region) {
+        final RegionMask mask = new RegionMask(region);
+        final LocalSession session = WorldeditRegions.worldedit.getSession(player);
         session.setMask(mask);
     }
 
     @Override
-    public void removeMask(LocalSession session) {
-        Mask mask = null;
+    public void removeMask(final LocalSession session) {
+        final Mask mask = null;
         session.setMask(mask);
     }
 
     @Override
-    public boolean cancelBrush(Player player, Vector location, CuboidRegion region) {
-        LocalSession session = WorldeditRegions.worldedit.getSession(player);
-        Tool brush = session.getTool(player.getItemInHand().getTypeId());
+    public boolean cancelBrush(final Player player, final Vector location, final CuboidRegion region) {
+        final LocalSession session = WorldeditRegions.worldedit.getSession(player);
+        final Tool brush = session.getTool(player.getItemInHand().getTypeId());
         if (brush != null) {
-            
-            if (brush instanceof BlockReplacer 
-             || brush instanceof BlockDataCyler 
-             || brush instanceof FloodFillTool 
-             || brush instanceof ButcherBrush) {
+
+            if ((brush instanceof BlockReplacer) || (brush instanceof BlockDataCyler) || (brush instanceof FloodFillTool) || (brush instanceof ButcherBrush)) {
                 return true;
             }
-            
-            if (brush instanceof DistanceWand
-             || brush instanceof FloatingTreeRemover
-             || brush instanceof TreePlanter
-             || brush instanceof AreaPickaxe
-             || brush instanceof SphereBrush
-             || brush instanceof SmoothBrush
-             || brush instanceof HollowSphereBrush
-             || brush instanceof HollowCylinderBrush
-             || brush instanceof GravityBrush
-             || brush instanceof CylinderBrush
-             || brush instanceof ClipboardBrush
-             || brush instanceof BrushTool) {
+
+            if ((brush instanceof DistanceWand) || (brush instanceof FloatingTreeRemover) || (brush instanceof TreePlanter) || (brush instanceof AreaPickaxe) || (brush instanceof SphereBrush) || (brush instanceof SmoothBrush) || (brush instanceof HollowSphereBrush) || (brush instanceof HollowCylinderBrush) || (brush instanceof GravityBrush) || (brush instanceof CylinderBrush) || (brush instanceof ClipboardBrush) || (brush instanceof BrushTool)) {
                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG15"));
             }
         }
         return false;
     }
-    
+
 }

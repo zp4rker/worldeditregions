@@ -9,22 +9,23 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import com.empcraft.wrg.WorldeditRegions;
 
 public class VaultHandler {
-    public static boolean enabled = false;
-    
-    
-    static WorldeditRegions WRG;
-    private static Permission perms = null;
-    
-    public VaultHandler(WorldeditRegions plugin,Plugin vault) {
+    public static boolean     enabled = false;
+
+    static WorldeditRegions   WRG;
+    private static Permission perms   = null;
+
+    public VaultHandler(final WorldeditRegions plugin, final Plugin vault) {
         WRG = plugin;
         enabled = true;
         setupPermissions();
     }
-    public static String[] getGroup(Player player) {
+
+    public static String[] getGroup(final Player player) {
         return perms.getPlayerGroups(player);
     }
+
     private static boolean setupPermissions() {
-        RegisteredServiceProvider<Permission> rsp = WRG.getServer().getServicesManager().getRegistration(Permission.class);
+        final RegisteredServiceProvider<Permission> rsp = WRG.getServer().getServicesManager().getRegistration(Permission.class);
         perms = rsp.getProvider();
         return perms != null;
     }

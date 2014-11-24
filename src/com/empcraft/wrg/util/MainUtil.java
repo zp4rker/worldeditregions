@@ -8,9 +8,9 @@ import com.empcraft.wrg.WorldeditRegions;
 
 public class MainUtil {
 
-    
     /**
-     * Send a message where each additional argument will replace the next occurrence of %s
+     * Send a message where each additional argument will replace the next
+     * occurrence of %s
      */
     public static boolean sendMessage(final Player plr, String msg, final String... args) {
         if ((args != null) && (args.length > 0)) {
@@ -27,18 +27,18 @@ public class MainUtil {
                 }
                 for (final String s : args) {
                     if (msg.contains("%s")) {
-                        msg = msg.replaceFirst("%s", prefix+s+suffix);
+                        msg = msg.replaceFirst("%s", prefix + s + suffix);
                     }
                 }
             }
         }
         return sendMessage(plr, msg);
     }
-    
+
     /**
      * Get message
      */
-    public static String getMessage(String key) {
+    public static String getMessage(final String key) {
         return WorldeditRegions.language.getString(key);
     }
 
@@ -59,7 +59,8 @@ public class MainUtil {
 
     /**
      * Check if a user has the permissions in a range e.g.<br>
-     * prisoncells.range.1, prisoncells.range.2 etc<br><br>
+     * prisoncells.range.1, prisoncells.range.2 etc<br>
+     * <br>
      * use a null player for console
      */
     public static int hasPermissionRange(final Player player, final String stub, final int range) {
@@ -79,9 +80,10 @@ public class MainUtil {
 
     /**
      * Check if a player has a permission<br>
-     *  - supports * nodes e.g. prisoncells.blah.*<br>
-     *  - supports op<br><br>
-     *  use null player for console
+     * - supports * nodes e.g. prisoncells.blah.*<br>
+     * - supports op<br>
+     * <br>
+     * use null player for console
      */
     public static boolean hasPermission(final Player player, final String perm) {
         if ((player == null) || player.isOp()) {
@@ -104,9 +106,10 @@ public class MainUtil {
 
     /**
      * Check if a player has several permissions<br>
-     *  - supports * nodes e.g. prisoncells.blah.*<br>
-     *  - supports op<br><br>
-     *  use null player for console
+     * - supports * nodes e.g. prisoncells.blah.*<br>
+     * - supports op<br>
+     * <br>
+     * use null player for console
      */
     public static boolean hasPermissions(final Player player, final String[] perms) {
         // Assumes null player is console.

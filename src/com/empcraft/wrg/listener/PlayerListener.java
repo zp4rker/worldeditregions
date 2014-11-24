@@ -1,10 +1,8 @@
 package com.empcraft.wrg.listener;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,48 +16,28 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import com.empcraft.wrg.WorldeditRegions;
 import com.empcraft.wrg.regions.WorldguardFeature;
 import com.empcraft.wrg.util.MainUtil;
 import com.empcraft.wrg.util.RegionHandler;
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldedit.command.tool.AreaPickaxe;
-import com.sk89q.worldedit.command.tool.BlockDataCyler;
-import com.sk89q.worldedit.command.tool.BlockReplacer;
-import com.sk89q.worldedit.command.tool.BrushTool;
-import com.sk89q.worldedit.command.tool.DistanceWand;
-import com.sk89q.worldedit.command.tool.FloatingTreeRemover;
-import com.sk89q.worldedit.command.tool.FloodFillTool;
-import com.sk89q.worldedit.command.tool.Tool;
-import com.sk89q.worldedit.command.tool.TreePlanter;
-import com.sk89q.worldedit.command.tool.brush.ButcherBrush;
-import com.sk89q.worldedit.command.tool.brush.ClipboardBrush;
-import com.sk89q.worldedit.command.tool.brush.CylinderBrush;
-import com.sk89q.worldedit.command.tool.brush.GravityBrush;
-import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
-import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
-import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
-import com.sk89q.worldedit.command.tool.brush.SphereBrush;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 public class PlayerListener implements Listener {
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+    public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
         if (cmd.getName().equalsIgnoreCase("wrg")) {
-            if (sender instanceof Player==false) {
+            if ((sender instanceof Player) == false) {
                 MainUtil.sendMessage(null, MainUtil.getMessage("MSG0"));
                 return false;
             }
-            Player player = (Player) sender;
-            
-            if (WorldguardFeature.worldguard !=null) {
+            final Player player = (Player) sender;
+
+            if (WorldguardFeature.worldguard != null) {
                 return WorldguardFeature.onCommand(sender, cmd, label, args);
             }
             else {
@@ -71,28 +49,28 @@ public class PlayerListener implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority=EventPriority.LOWEST)
-    public static void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
+    @EventHandler(priority = EventPriority.LOWEST)
+    public static void onPlayerInteract(final PlayerInteractEvent event) {
+        final Player player = event.getPlayer();
         if (RegionHandler.disabled.contains(player.getWorld().getName())) {
             return;
         }
-        String name = player.getName();
+        final String name = player.getName();
         if (RegionHandler.bypass.contains(name)) {
             return;
         }
-        
+
         RegionHandler.setMask(player, false);
-        
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK||event.getAction() == Action.RIGHT_CLICK_AIR) {
+
+        if ((event.getAction() == Action.RIGHT_CLICK_BLOCK) || (event.getAction() == Action.RIGHT_CLICK_AIR)) {
             try {
-                
+
                 if (!RegionHandler.id.containsKey(name) || !RegionHandler.lastmask.containsKey(name)) {
                     return;
                 }
-                
-                CuboidRegion region = RegionHandler.lastmask.get(player.getName());
-                
+
+                final CuboidRegion region = RegionHandler.lastmask.get(player.getName());
+
                 Vector loc;
                 if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                     loc = new Vector(player.getTargetBlock(null, 64).getX(), player.getTargetBlock(null, 64).getY(), player.getTargetBlock(null, 64).getZ());
@@ -100,110 +78,113 @@ public class PlayerListener implements Listener {
                 else {
                     loc = new Vector(event.getClickedBlock().getX(), event.getClickedBlock().getY(), event.getClickedBlock().getZ());
                 }
-                
+
                 if (region.contains(loc)) {
                     return;
                 }
-                boolean result = RegionHandler.maskManager.cancelBrush(player, loc, region);
+                final boolean result = RegionHandler.maskManager.cancelBrush(player, loc, region);
                 if (result) {
                     MainUtil.sendMessage(player, MainUtil.getMessage("MSG20"));
                     event.setCancelled(true);
                     return;
                 }
             }
-            catch (Exception e) {}
+            catch (final Exception e) {
+            }
         }
     }
+
     @EventHandler
-    public static void onWorldChange(PlayerChangedWorldEvent event) {
-        Player player = event.getPlayer();
-        String name = player.getName();
+    public static void onWorldChange(final PlayerChangedWorldEvent event) {
+        final Player player = event.getPlayer();
+        final String name = player.getName();
         if ((!RegionHandler.disabled.contains(player.getWorld().getName())) && (!RegionHandler.bypass.contains(name))) {
-            RegionHandler.setMask(event.getPlayer(),false);
+            RegionHandler.setMask(event.getPlayer(), false);
         }
         else {
             RegionHandler.removeMask(player);
             RegionHandler.unregisterPlayer(player);
         }
     }
-    
-    
-    
+
     @EventHandler
-    public static void onPlayerTeleport(PlayerTeleportEvent event) {
-        
-        Player player = event.getPlayer();
+    public static void onPlayerTeleport(final PlayerTeleportEvent event) {
+
+        final Player player = event.getPlayer();
         if (RegionHandler.disabled.contains(player.getWorld().getName())) {
             return;
         }
-        String name = player.getName();
+        final String name = player.getName();
         if (RegionHandler.bypass.contains(name)) {
             return;
         }
-        
-        Location f = event.getFrom();
-        Location t = event.getTo();
-        
-        if (f != null && t != null) {
+
+        final Location f = event.getFrom();
+        final Location t = event.getTo();
+
+        if ((f != null) && (t != null)) {
             if (event.getFrom().getWorld().equals(event.getTo().getWorld())) {
-                RegionHandler.setMask(event.getPlayer(),false);
+                RegionHandler.setMask(event.getPlayer(), false);
             }
         }
     }
-    
-    @EventHandler(priority=EventPriority.LOW, ignoreCancelled=true)
-    public static void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public static void onPlayerJoin(final PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
         RegionHandler.refreshPlayer(player);
         RegionHandler.setMask(player, false);
     }
+
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(final PlayerQuitEvent event) {
         RegionHandler.unregisterPlayer(event.getPlayer());
     }
+
     @EventHandler
-    public static void onPlayerMove(PlayerMoveEvent event) {
-        Location f = event.getFrom();
-        Location t = event.getTo();
-        
-        if (f.getBlockX() != t.getBlockX() || f.getBlockZ() != t.getBlockZ() || f.getBlockY() != t.getBlockY()) {
-            RegionHandler.setMask(event.getPlayer(),false);
+    public static void onPlayerMove(final PlayerMoveEvent event) {
+        final Location f = event.getFrom();
+        final Location t = event.getTo();
+
+        if ((f.getBlockX() != t.getBlockX()) || (f.getBlockZ() != t.getBlockZ()) || (f.getBlockY() != t.getBlockY())) {
+            RegionHandler.setMask(event.getPlayer(), false);
         }
     }
-    @EventHandler(priority=EventPriority.LOWEST, ignoreCancelled=true)
-    public static void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        
-        Player player = event.getPlayer();
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public static void onPlayerCommandPreprocess(final PlayerCommandPreprocessEvent event) {
+
+        final Player player = event.getPlayer();
         if (RegionHandler.disabled.contains(player.getWorld().getName())) {
             return;
         }
-        String name = player.getName();
+        final String name = player.getName();
         if (RegionHandler.bypass.contains(name)) {
             return;
         }
-        
-        String[] args = event.getMessage().split(" ");
-        
+
+        final String[] args = event.getMessage().split(" ");
+
         if (args.length == 0) {
             return;
         }
-        
-        List<String> restricted = Arrays.asList(new String[] {"/up","//up","/worldedit:/up"});
-        
-        List<String> masked = Arrays.asList(new String[] {"/regen","//regen","/worldedit:/regen", "/copy","//copy","/worldedit:/copy"});
-        
-        List<String> blocked = Arrays.asList(new String[] {"/gmask","//gmask","/worldedit:/gmask"});
-        
-        List<String> monitored = Arrays.asList(new String[] {"set", "replace", "overlay", "walls", "outline", "deform", "hollow", "smooth", "move", "stack", "naturalize", "paste"});
-        
-        String start = args[0].toLowerCase();
-        
+
+        final List<String> restricted = Arrays.asList(new String[] { "/up", "//up", "/worldedit:/up" });
+
+        final List<String> masked = Arrays.asList(new String[] { "/regen", "//regen", "/worldedit:/regen", "/copy", "//copy", "/worldedit:/copy" });
+
+        final List<String> blocked = Arrays.asList(new String[] { "/gmask", "//gmask", "/worldedit:/gmask" });
+
+        final List<String> monitored = Arrays.asList(new String[] { "set", "replace", "overlay", "walls", "outline", "deform", "hollow", "smooth", "move", "stack", "naturalize", "paste" });
+
+        final String start = args[0].toLowerCase();
+
         if (restricted.contains(start)) {
-            if (args.length>1) {
+            if (args.length > 1) {
                 if (RegionHandler.id.containsKey(name) && (RegionHandler.id.get(name) != null)) {
-                    CuboidRegion mymask = RegionHandler.lastmask.get(player.getName());
-                    Vector loc = new Vector(player.getLocation().getX(), player.getLocation().getY()+Integer.parseInt(args[1]), player.getLocation().getZ());
-                    if (mymask == null || mymask.contains(loc)==false) {
+                    final CuboidRegion mymask = RegionHandler.lastmask.get(player.getName());
+                    final Vector loc = new Vector(player.getLocation().getX(), player.getLocation().getY() + Integer.parseInt(args[1]), player.getLocation().getZ());
+                    if ((mymask == null) || (mymask.contains(loc) == false)) {
                         MainUtil.sendMessage(player, MainUtil.getMessage("MSG6"));
                         event.setCancelled(true);
                         return;
@@ -222,16 +203,16 @@ public class PlayerListener implements Listener {
             }
         }
         else if (masked.contains(start)) {
-            Selection selection = WorldeditRegions.worldedit.getSelection(event.getPlayer());
-            if (selection!=null) {
-                BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
-                BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
-                CuboidRegion myregion = RegionHandler.lastmask.get(event.getPlayer().getName());
-                if (myregion==null) {
+            final Selection selection = WorldeditRegions.worldedit.getSelection(event.getPlayer());
+            if (selection != null) {
+                final BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
+                final BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
+                final CuboidRegion myregion = RegionHandler.lastmask.get(event.getPlayer().getName());
+                if (myregion == null) {
                     MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                 }
                 else {
-                    if ((myregion.contains(pos1) && myregion.contains(pos2))==false) {
+                    if ((myregion.contains(pos1) && myregion.contains(pos2)) == false) {
                         MainUtil.sendMessage(player, MainUtil.getMessage("MSG23"));
                     }
                     else {
@@ -247,25 +228,25 @@ public class PlayerListener implements Listener {
             return;
         }
         else {
-            for (String cmd : monitored) {
-                if (start.equals("//"+cmd) || start.equals("/"+cmd) || start.equals("/worldedit:/"+cmd)) {
-                    Selection selection = WorldeditRegions.worldedit.getSelection(event.getPlayer());
-                    if (selection!=null) {
-                        BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
-                        BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
-                        CuboidRegion myregion = RegionHandler.lastmask.get(event.getPlayer().getName());
-                        if (myregion==null) {
+            for (final String cmd : monitored) {
+                if (start.equals("//" + cmd) || start.equals("/" + cmd) || start.equals("/worldedit:/" + cmd)) {
+                    final Selection selection = WorldeditRegions.worldedit.getSelection(event.getPlayer());
+                    if (selection != null) {
+                        final BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
+                        final BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
+                        final CuboidRegion myregion = RegionHandler.lastmask.get(event.getPlayer().getName());
+                        if (myregion == null) {
                             MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                         }
                         else {
-                            if ((myregion.contains(pos1) && myregion.contains(pos2))==false) {
+                            if ((myregion.contains(pos1) && myregion.contains(pos2)) == false) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG15"));
                             }
                         }
                     }
                     return;
                 }
-                
+
             }
         }
     }
