@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -42,6 +44,11 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
         this.reloadConfig();
         this.saveConfig();
         MainUtil.sendMessage(null, "&f&oThanks for using &aWorldeditRegions&f by &dEmpire92&f!");
+    }
+
+    @Override
+    public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
+        return PlayerListener.onCommand(sender, cmd, label, args);
     }
 
     public static boolean iswhitelisted(final String arg) {

@@ -147,7 +147,7 @@ public class WorldguardFeature extends AbstractRegion {
                 if (args[0].equalsIgnoreCase("trust")) {
                     if (MainUtil.hasPermission(player, "worldguard.region.addmember.own.*")) {
                         if (args.length > 1) {
-                            if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
+                            if (RegionHandler.lastmask.get(player.getName()) == null) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                             }
                             else {
@@ -175,7 +175,7 @@ public class WorldguardFeature extends AbstractRegion {
                 if (args[0].equalsIgnoreCase("share")) {
                     if (MainUtil.hasPermission(player, "worldguard.region.addowner.own.*")) {
                         if (args.length > 1) {
-                            if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
+                            if (RegionHandler.lastmask.get(player.getName()) == null) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                             }
                             else {
@@ -203,7 +203,7 @@ public class WorldguardFeature extends AbstractRegion {
                 else if (args[0].equalsIgnoreCase("untrust")) {
                     if (MainUtil.hasPermission(player, "worldguard.region.removemember.own.*")) {
                         if (args.length > 1) {
-                            if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
+                            if (RegionHandler.lastmask.get(player.getName()) == null) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                             }
                             else {
@@ -229,7 +229,7 @@ public class WorldguardFeature extends AbstractRegion {
                     return true;
                 }
                 else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("i")) {
-                    if (RegionHandler.id.get(player.getName()).equals("~NULL")) {
+                    if (RegionHandler.id.get(player.getName()) == null) {
                         MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                     }
                     else {
@@ -375,7 +375,7 @@ public class WorldguardFeature extends AbstractRegion {
                     return true;
                 }
                 else if (args[0].equalsIgnoreCase("remove")) {
-                    if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
+                    if (RegionHandler.lastmask.get(player.getName()) == null) {
                         MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                         if (MainUtil.hasPermission(player, "worldguard.region.remove.*")) {
                             MainUtil.sendMessage(player, MainUtil.getMessage("MSG9"));
@@ -395,7 +395,7 @@ public class WorldguardFeature extends AbstractRegion {
 
                     if (args.length == 2) {
                         if (MainUtil.hasPermission(player, "worldguard.region.flag.regions.own." + args[0])) {
-                            if (RegionHandler.lastmask.get(player.getName()).equals("~NULL")) {
+                            if (RegionHandler.lastmask.get(player.getName()) == null) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
                                 if (MainUtil.hasPermission(player, "worldguard.region.flag.regions.*")) {
                                     MainUtil.sendMessage(player, MainUtil.getMessage("MSG10"));

@@ -122,7 +122,7 @@ public class RegionHandler {
             }
             else {
                 if (id.containsKey(name) && lastregion.containsKey(name)) {
-                    if (id.get(name) != null && (!id.get(name).equals(myID))) {
+                    if ((id.get(name) != null) && (!id.get(name).equals(myID))) {
                         if (lastregion.get(name)) {
                             if (MainUtil.hasPermission(player, "wrg.notify.farewell")) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG22"), myID);

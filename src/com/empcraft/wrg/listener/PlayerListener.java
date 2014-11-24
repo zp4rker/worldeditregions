@@ -29,7 +29,8 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 public class PlayerListener implements Listener {
-    public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
+
+    public static boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
         if (cmd.getName().equalsIgnoreCase("wrg")) {
             if ((sender instanceof Player) == false) {
                 MainUtil.sendMessage(null, MainUtil.getMessage("MSG0"));
@@ -49,7 +50,7 @@ public class PlayerListener implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public static void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         if (RegionHandler.disabled.contains(player.getWorld().getName())) {
@@ -94,7 +95,7 @@ public class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public static void onWorldChange(final PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
         final String name = player.getName();
@@ -107,7 +108,7 @@ public class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public static void onPlayerTeleport(final PlayerTeleportEvent event) {
 
         final Player player = event.getPlayer();
@@ -129,19 +130,19 @@ public class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public static void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         RegionHandler.refreshPlayer(player);
         RegionHandler.setMask(player, false);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerQuit(final PlayerQuitEvent event) {
         RegionHandler.unregisterPlayer(event.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public static void onPlayerMove(final PlayerMoveEvent event) {
         final Location f = event.getFrom();
         final Location t = event.getTo();

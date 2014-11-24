@@ -6,8 +6,6 @@ import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 
-
-
 public class FlagHandler {
     public static boolean              enabled          = false;
     private static WGCustomFlagsPlugin plugin           = null;
@@ -21,7 +19,7 @@ public class FlagHandler {
         FlagHandler.plugin.addCustomFlag(WORLDEDIT_REGION);
     }
 
-    public static boolean hasFlag(ApplicableRegionSet set) {
+    public static boolean hasFlag(final ApplicableRegionSet set) {
         return set.allows(WORLDEDIT_REGION);
     }
 }
