@@ -100,13 +100,12 @@ public class RegionHandler {
             }
             if (myMask != null) {
                 if (id.containsKey(name) && lastregion.containsKey(name)) {
-                    if (id.get(name).equals(id) && (id.get(name) != null)) {
+                    if (id.get(name).equals(myID) && (id.get(name) != null)) {
                         if (!lastregion.get(name)) {
                             if (MainUtil.hasPermission(player, "wrg.notify.greeting")) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG21"), myID);
                             }
                         }
-                        return;
                     }
                 }
                 else if (MainUtil.hasPermission(player, "wrg.notify")) {
@@ -123,12 +122,13 @@ public class RegionHandler {
             }
             else {
                 if (id.containsKey(name) && lastregion.containsKey(name)) {
-                    if (id.get(name).equals(id)) {
+                    if (id.get(name) != null && (!id.get(name).equals(myID))) {
                         if (lastregion.get(name)) {
-                            if (MainUtil.hasPermission(player, "wrg.notify")) {
+                            if (MainUtil.hasPermission(player, "wrg.notify.farewell")) {
                                 MainUtil.sendMessage(player, MainUtil.getMessage("MSG22"), myID);
                             }
                         }
+                        lastregion.put(name, false);
                         return;
                     }
                 }
