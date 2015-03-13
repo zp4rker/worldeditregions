@@ -86,12 +86,6 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
         }
         saveConfig();
         this.saveDefaultConfig();
-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        for (final Player player : Bukkit.getOnlinePlayers()) {
-            RegionHandler.refreshPlayer(player);
-            RegionHandler.setMask(player, false);
-        }
-
         final File yamlFile = new File(getDataFolder(), getConfig().getString("language").toLowerCase() + ".yml");
         language = YamlConfiguration.loadConfiguration(yamlFile);
         config = getConfig();
@@ -134,7 +128,8 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
             MainUtil.sendMessage(null, "&8[&9WRG&8] &7Hooking into Regios");
         }
         final Plugin factionsPlugin = getServer().getPluginManager().getPlugin("Factions");
-        final Plugin mCorePlugin = getServer().getPluginManager().getPlugin("mcore");
+        Plugin mCorePlugin = getServer().getPluginManager().getPlugin("mcore");
+        if(mCorePlugin == null) mCorePlugin = getServer().getPluginManager().getPlugin("MassiveCore");
         if ((factionsPlugin != null) && factionsPlugin.isEnabled()) {
             if ((mCorePlugin != null) && mCorePlugin.isEnabled()) {
                 final FactionsFeature ff = new FactionsFeature(factionsPlugin, this);
@@ -167,6 +162,11 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
             MainUtil.sendMessage(null, "&8[&9WRG&8] &7Hooking into PreciousStones");
         }
         worldedit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        for (final Player player : Bukkit.getOnlinePlayers()) {
+            RegionHandler.refreshPlayer(player);
+            RegionHandler.setMask(player, false);
+        }
     }
 
 }
