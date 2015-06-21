@@ -1,4 +1,4 @@
-# english.yml language file for Worldedit Regions 
+# english.yml language file for Worldedit Regions
 # To edit the messages:
 #  - Duplicate this file e.g. to "lang_custom.yml"
 #  - Change the messages to your liking
@@ -9,7 +9,7 @@
 MSG0: "&7This command can only be executed &cin-game&7!"
 #MSG1: Received when teleporting to another map, your region gets deleted, or you try to worldedit outside a region
 MSG1: "&7You have no current &cWorldedit Region&7."
-#MSG2: Received when adding a player to a region e.g. "Successfully added Notch" 
+#MSG2: Received when adding a player to a region e.g. "Successfully added Notch"
 MSG2: "&7Successfully added"
 #MSG3: Received when you enter "/wrg trust"
 MSG3: "&7Add user to your region: &a/wrg trust <player>"
@@ -38,6 +38,7 @@ MSG21: "&7Entering your &aWorldedit &7Region."
 MSG22: "&7Leaving your &aWorldedit &7Region."
 MSG23: "&7You cannot &cedit&7 outside your own region."
 MSG24: "&dThanks for using WorldEditRegions by Empire92"
+MSG25: "&7Set home location to current position!"
 ERROR: "&8[&4WRG&8] &c"
 ERROR: "&8[&4WRG&8] &c"
 WARNING: "&8[&6WRG&8] &e"

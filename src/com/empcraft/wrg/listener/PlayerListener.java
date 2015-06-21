@@ -1,6 +1,7 @@
 package com.empcraft.wrg.listener;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -74,7 +75,7 @@ public class PlayerListener implements Listener {
 
                 Vector loc;
                 if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-                    loc = new Vector(player.getTargetBlock(null, 64).getX(), player.getTargetBlock(null, 64).getY(), player.getTargetBlock(null, 64).getZ());
+                    loc = new Vector(player.getTargetBlock((HashSet<Byte>)null, 64).getX(), player.getTargetBlock((HashSet<Byte>)null, 64).getY(),player.getTargetBlock((HashSet<Byte>)null, 64).getZ());
                 }
                 else {
                     loc = new Vector(event.getClickedBlock().getX(), event.getClickedBlock().getY(), event.getClickedBlock().getZ());
@@ -100,6 +101,7 @@ public class PlayerListener implements Listener {
         final Player player = event.getPlayer();
         final String name = player.getName();
         if ((!RegionHandler.disabled.contains(player.getWorld().getName())) && (!RegionHandler.bypass.contains(name))) {
+            RegionHandler.refreshPlayer(player);
             RegionHandler.setMask(event.getPlayer(), false);
         }
         else {

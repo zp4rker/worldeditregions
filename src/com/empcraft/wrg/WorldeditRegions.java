@@ -74,7 +74,7 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
         options.put("factions.max-chunk-traversal", 10);
         options.put("language", "english");
         options.put("create.add-owner", true);
-        options.put("max-region-count-per-player", 7);
+        options.put("min-width", 16);
         options.put("worldguard.require-custom-flag", false);
         options.put("max-claim-area", 1024);
         final List<String> ignore = Arrays.asList("PlotMe", "PlotWorld");
@@ -128,7 +128,7 @@ public final class WorldeditRegions extends JavaPlugin implements Listener {
             MainUtil.sendMessage(null, "&8[&9WRG&8] &7Hooking into Regios");
         }
         final Plugin factionsPlugin = getServer().getPluginManager().getPlugin("Factions");
-        Plugin mCorePlugin = getServer().getPluginManager().getPlugin("mcore");
+        Plugin mCorePlugin = getServer().getPluginManager().getPlugin("MassiveCore");
         if(mCorePlugin == null) mCorePlugin = getServer().getPluginManager().getPlugin("MassiveCore");
         if ((factionsPlugin != null) && factionsPlugin.isEnabled()) {
             if ((mCorePlugin != null) && mCorePlugin.isEnabled()) {

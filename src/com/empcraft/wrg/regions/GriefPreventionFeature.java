@@ -28,10 +28,11 @@ public class GriefPreventionFeature extends AbstractRegion {
         final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
         if (claim != null) {
             boolean hasPerm = false;
-            if (claim.getOwnerName().equalsIgnoreCase(player.getName())) {
+            String uuid = player.getUniqueId().toString();
+            if (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim.getOwnerName().equals(uuid)) {
                 hasPerm = true;
             }
-            else if (claim.isManager(player.getName()) && MainUtil.hasPermission(player, "wrg.griefprevention.member")) {
+            else if ((claim.managers.contains(player.getName()) || claim.managers.contains(uuid)) && MainUtil.hasPermission(player, "wrg.griefprevention.member")) {
                 hasPerm = true;
             }
             if (hasPerm) {

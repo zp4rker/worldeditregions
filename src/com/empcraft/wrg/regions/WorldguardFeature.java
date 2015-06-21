@@ -1,31 +1,52 @@
+
 package com.empcraft.wrg.regions;
+
+import java.util.HashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.empcraft.wrg.WorldeditRegions;
+import com.empcraft.wrg.command.Create;
+import com.empcraft.wrg.command.Flag;
+import com.empcraft.wrg.command.Help;
+import com.empcraft.wrg.command.Home;
+import com.empcraft.wrg.command.Info;
+import com.empcraft.wrg.command.ListCmd;
+import com.empcraft.wrg.command.Remove;
+import com.empcraft.wrg.command.Sethome;
+import com.empcraft.wrg.command.Share;
+import com.empcraft.wrg.command.Trust;
+import com.empcraft.wrg.command.Untrust;
 import com.empcraft.wrg.object.AbstractRegion;
+import com.empcraft.wrg.object.ChunkLoc;
 import com.empcraft.wrg.object.CuboidRegionWrapper;
 import com.empcraft.wrg.util.FlagHandler;
 import com.empcraft.wrg.util.MainUtil;
 import com.empcraft.wrg.util.RegionHandler;
 import com.empcraft.wrg.util.VaultHandler;
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 
 public class WorldguardFeature extends AbstractRegion {
     public static WorldGuardPlugin worldguard = null;
+    public static ProfileCache cache;
     WorldeditRegions               plugin;
 
     private WorldGuardPlugin getWorldGuard() {
@@ -41,16 +62,157 @@ public class WorldguardFeature extends AbstractRegion {
 
     public WorldguardFeature(final Plugin p2, final WorldeditRegions p3) {
         worldguard = getWorldGuard();
+        cache = worldguard.getProfileCache();
         this.plugin = p3;
 
     }
+    
+    public static void temporaryHighlight(final Vector2D bottom, final Vector2D top, final Player player, int id, long time) {
+        highlightRegion(bottom, top, player, id);
+        Bukkit.getScheduler().runTaskLater(WorldeditRegions.plugin, new Runnable() {
+            @Override
+            public void run() {
+                highlightRegion(bottom, top, player, -1);
+            }
+        }, time);
+    }
+    
+    public static void sendBlock(Player player, Location loc, int id) {
+        if (id != -1) {
+            player.sendBlockChange(loc, id, (byte) 0);
+        }
+        else {
+            Block block = loc.getBlock();
+            id = block.getTypeId();
+            byte data = block.getData();
+            player.sendBlockChange(loc, id, data);
+        }
+    }
+    
+    public static void highlightRegion(Vector2D bottom, Vector2D top, Player player, int id) {
+        int view_distance = Bukkit.getViewDistance();
+        Chunk playerChunk = player.getLocation().getChunk();
+        int pcx = playerChunk.getX();
+        int pcz = playerChunk.getZ();
+        World world = player.getWorld();
+        HashMap<ChunkLoc, Chunk> chunks = new HashMap<>();
+        int x, z;
+        z = bottom.getBlockZ();
+        for (x = bottom.getBlockX(); x <= (top.getBlockX() - 1); x++) {
+            ChunkLoc loc = new ChunkLoc(x >> 4, z >> 4);
+            Chunk c;
+            if (chunks.containsKey(loc)) {
+                c = chunks.get(loc);
+                if (c == null) {
+                    continue;
+                }
+            }
+            else {
+                if (Math.abs(pcx - loc.x) > view_distance || Math.abs(pcz - loc.z) > view_distance) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                c = world.getChunkAt(loc.x, loc.z);
+                if (!c.isLoaded()) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                else {
+                    chunks.put(loc, null);
+                }
+            }
+            Location l = new Location(world, x, world.getHighestBlockYAt(x, z), z);
+            sendBlock(player, l, id);
+        }
+        x = top.getBlockX();
+        for (z = bottom.getBlockZ(); z <= (top.getBlockZ() - 1); z++) {
+            ChunkLoc loc = new ChunkLoc(x >> 4, z >> 4);
+            Chunk c;
+            if (chunks.containsKey(loc)) {
+                c = chunks.get(loc);
+                if (c == null) {
+                    continue;
+                }
+            }
+            else {
+                if (Math.abs(pcx - loc.x) > view_distance || Math.abs(pcz - loc.z) > view_distance) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                c = world.getChunkAt(loc.x, loc.z);
+                if (!c.isLoaded()) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                else {
+                    chunks.put(loc, null);
+                }
+            }
+            Location l = new Location(world, x, world.getHighestBlockYAt(x, z), z);
+            sendBlock(player, l, id);
+        }
+        z = top.getBlockZ();
+        for (x = top.getBlockX(); x >= (bottom.getBlockX() + 1); x--) {
+            ChunkLoc loc = new ChunkLoc(x >> 4, z >> 4);
+            Chunk c;
+            if (chunks.containsKey(loc)) {
+                c = chunks.get(loc);
+                if (c == null) {
+                    continue;
+                }
+            }
+            else {
+                if (Math.abs(pcx - loc.x) > view_distance || Math.abs(pcz - loc.z) > view_distance) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                c = world.getChunkAt(loc.x, loc.z);
+                if (!c.isLoaded()) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                else {
+                    chunks.put(loc, null);
+                }
+            }
+            Location l = new Location(world, x, world.getHighestBlockYAt(x, z), z);
+            sendBlock(player, l, id);
+        }
+        x = bottom.getBlockX();
+        for (z = top.getBlockZ(); z >= (bottom.getBlockZ() + 1); z--) {
+            ChunkLoc loc = new ChunkLoc(x >> 4, z >> 4);
+            Chunk c;
+            if (chunks.containsKey(loc)) {
+                c = chunks.get(loc);
+                if (c == null) {
+                    continue;
+                }
+            }
+            else {
+                if (Math.abs(pcx - loc.x) > view_distance || Math.abs(pcz - loc.z) > view_distance) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                c = world.getChunkAt(loc.x, loc.z);
+                if (!c.isLoaded()) {
+                    chunks.put(loc, null);
+                    continue;
+                }
+                else {
+                    chunks.put(loc, null);
+                }
+            }
+            Location l = new Location(world, x, world.getHighestBlockYAt(x, z), z);
+            sendBlock(player, l, id);
+        }
+    }
 
     public ProtectedRegion isowner(final Player player) {
-        final com.sk89q.worldguard.LocalPlayer localplayer = worldguard.wrapPlayer(player);
-        final RegionManager manager = worldguard.getRegionManager(player.getWorld());
+        final LocalPlayer localplayer = WorldguardFeature.worldguard.wrapPlayer(player);
+        final RegionManager manager = WorldguardFeature.worldguard.getRegionManager(player.getWorld());
         final ProtectedRegion myregion = manager.getRegion("__global__");
         final ApplicableRegionSet regions = manager.getApplicableRegions(player.getLocation());
-        if ((myregion != null) && (!FlagHandler.enabled || FlagHandler.hasFlag(regions)) && (myregion.isOwner(localplayer) || (myregion.isMember(localplayer) && MainUtil.hasPermission(player, "wrg.worldguard.member")))) {
+        if ((myregion != null) && (!FlagHandler.enabled || FlagHandler.hasFlag(regions)) && (myregion.isOwner(localplayer) || (myregion.isMember(localplayer) && MainUtil.hasPermission(player, "wrg.WorldguardFeature.worldguard.member")))) {
             final BlockVector pt1 = new BlockVector(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
             final BlockVector pt2 = new BlockVector(Integer.MAX_VALUE, 256, Integer.MAX_VALUE);
             return new ProtectedCuboidRegion("__global__-" + player.getWorld().getName(), pt1, pt2);
@@ -63,7 +225,7 @@ public class WorldguardFeature extends AbstractRegion {
                 return region;
             }
             if (region.isMember(localplayer)) {
-                if (MainUtil.hasPermission(player, "wrg.worldguard.member")) {
+                if (MainUtil.hasPermission(player, "wrg.WorldguardFeature.worldguard.member")) {
                     return region;
                 }
             }
@@ -79,7 +241,7 @@ public class WorldguardFeature extends AbstractRegion {
             if (VaultHandler.enabled) {
                 final String[] groups = VaultHandler.getGroup(player);
                 boolean hasPerm = false;
-                if (MainUtil.hasPermission(player, "wrg.worldguard.member")) {
+                if (MainUtil.hasPermission(player, "wrg.WorldguardFeature.worldguard.member")) {
                     hasPerm = true;
                 }
                 for (final String group : groups) {
@@ -100,8 +262,8 @@ public class WorldguardFeature extends AbstractRegion {
     }
 
     public ProtectedRegion getregion(final Player player, final BlockVector location) {
-        final com.sk89q.worldguard.LocalPlayer localplayer = worldguard.wrapPlayer(player);
-        final ApplicableRegionSet regions = worldguard.getRegionManager(player.getWorld()).getApplicableRegions(location);
+        final com.sk89q.worldguard.LocalPlayer localplayer = WorldguardFeature.worldguard.wrapPlayer(player);
+        final ApplicableRegionSet regions = WorldguardFeature.worldguard.getRegionManager(player.getWorld()).getApplicableRegions(location);
         for (final ProtectedRegion region : regions) {
             if (region.isOwner(localplayer)) {
                 return region;
@@ -143,256 +305,46 @@ public class WorldguardFeature extends AbstractRegion {
             else {
                 player = (Player) sender;
             }
-            if (args.length > 0) {
-                if (args[0].equalsIgnoreCase("trust")) {
-                    if (MainUtil.hasPermission(player, "worldguard.region.addmember.own.*")) {
-                        if (args.length > 1) {
-                            if (RegionHandler.lastmask.get(player.getName()) == null) {
-                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
-                            }
-                            else {
-                                final DefaultDomain domain = worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).getMembers();
-                                domain.addPlayer(args[1]);
-                                worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).setMembers(domain);
-                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG2") + " &a" + args[1] + "&7.");
-                                try {
-                                    worldguard.getRegionManager(player.getWorld()).save();
-                                }
-                                catch (final Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        else {
-                            MainUtil.sendMessage(player, MainUtil.getMessage("MSG3"));
-                        }
-                    }
-                    else {
-                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG4") + " &cworldguard.region.addmember.own.*");
-                    }
-                    return true;
+            if (args.length == 0) {
+                Bukkit.dispatchCommand(player, "wrg help");
+                return false;
+            }
+            
+            switch (args[0].toLowerCase()) {
+                case "trust": {
+                    return Trust.execute(player, args);
                 }
-                if (args[0].equalsIgnoreCase("share")) {
-                    if (MainUtil.hasPermission(player, "worldguard.region.addowner.own.*")) {
-                        if (args.length > 1) {
-                            if (RegionHandler.lastmask.get(player.getName()) == null) {
-                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
-                            }
-                            else {
-                                final DefaultDomain domain = worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).getOwners();
-                                domain.addPlayer(args[1]);
-                                worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).setOwners(domain);
-                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG2") + " &a" + args[1] + "&7.");
-                                try {
-                                    worldguard.getRegionManager(player.getWorld()).save();
-                                }
-                                catch (final Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        else {
-                            MainUtil.sendMessage(player, MainUtil.getMessage("MSG11"));
-                        }
-                    }
-                    else {
-                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG4") + " &cworldguard.region.addowner.own.*");
-                    }
-                    return true;
+                case "share": {
+                    return Share.execute(player, args);
                 }
-                else if (args[0].equalsIgnoreCase("untrust")) {
-                    if (MainUtil.hasPermission(player, "worldguard.region.removemember.own.*")) {
-                        if (args.length > 1) {
-                            if (RegionHandler.lastmask.get(player.getName()) == null) {
-                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
-                            }
-                            else {
-                                final DefaultDomain domain = worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).getMembers();
-                                domain.removePlayer(args[1]);
-                                worldguard.getRegionManager(player.getWorld()).getRegion(RegionHandler.id.get(player.getName())).setMembers(domain);
-                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG12") + " &c" + args[1] + "&7.");
-                                try {
-                                    worldguard.getRegionManager(player.getWorld()).save();
-                                }
-                                catch (final Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        else {
-                            MainUtil.sendMessage(player, MainUtil.getMessage("MSG13"));
-                        }
-                    }
-                    else {
-                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG4") + " &cworldguard.region.removemember.own.*");
-                    }
-                    return true;
+                case "untrust": {
+                    return Untrust.execute(player, args);
                 }
-                else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("i")) {
-                    if (RegionHandler.id.get(player.getName()) == null) {
-                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
-                    }
-                    else {
-                        Bukkit.dispatchCommand(player, "region info " + RegionHandler.id.get(player.getName()));
-                    }
-                    return true;
+                case "info": {
+                    return Info.execute(player, args);
                 }
-                else if (args[0].equalsIgnoreCase("create")) {
-                    if (MainUtil.hasPermission(player, "worldguard.region.define")) {
-                        if (args.length == 2) {
-                            final boolean op = player.isOp();
-                            player.setOp(true);
-                            try {
-                                ProtectedRegion myregion = worldguard.getRegionManager(player.getWorld()).getRegion(args[1]);
-                                if (myregion == null) {
-                                    if (WorldeditRegions.config.getBoolean("create.expand-vert")) {
-                                        Bukkit.dispatchCommand(player, "/expand vert");
-                                    }
-                                    if (WorldeditRegions.config.getBoolean("create.add-owner")) {
-                                        Bukkit.dispatchCommand(player, "region define " + args[1] + " " + args[1]);
-                                    }
-                                    else {
-                                        Bukkit.dispatchCommand(player, "region define " + args[1]);
-                                    }
-                                    return true;
-                                }
-                                else {
-                                    if (WorldeditRegions.config.getBoolean("create.expand-vert")) {
-                                        Bukkit.dispatchCommand(player, "/expand vert");
-                                    }
-                                    final int max = (WorldeditRegions.config.getInt("max-region-count-per-player"));
-                                    for (int i = 0; i < (max - 1); i++) {
-                                        myregion = worldguard.getRegionManager(player.getWorld()).getRegion(args[1] + "//" + i);
-                                        if (myregion == null) {
-                                            if (WorldeditRegions.config.getBoolean("create.expand-vert")) {
-                                                Bukkit.dispatchCommand(player, "/expand vert");
-                                            }
-                                            if (WorldeditRegions.config.getBoolean("create.add-owner")) {
-                                                Bukkit.dispatchCommand(player, "region define " + args[1] + "//" + i + " " + args[1]);
-                                            }
-                                            else {
-                                                Bukkit.dispatchCommand(player, "region define " + args[1] + "//" + i);
-                                            }
-                                            return true;
-                                        }
-
-                                    }
-                                    MainUtil.sendMessage(player, "&c" + args[1] + "&7 " + MainUtil.getMessage("MSG14"));
-                                }
-                            }
-                            catch (final Exception e) {
-
-                            }
-                            finally {
-                                player.setOp(op);
-                            }
-                        }
-                        else {
-                            MainUtil.sendMessage(player, MainUtil.getMessage("MSG8"));
-                        }
-                    }
-                    else {
-                        if (MainUtil.hasPermission(player, "worldguard.region.define.own")) {
-                            final Selection selection = WorldeditRegions.worldedit.getSelection(player);
-                            if (selection != null) {
-                                WorldeditRegions.worldedit.getSession(player);
-                                worldguard.wrapPlayer(player);
-                                final BlockVector pos1 = selection.getNativeMinimumPoint().toBlockVector();
-                                final BlockVector pos2 = selection.getNativeMaximumPoint().toBlockVector();
-                                worldguard.getRegionManager(player.getWorld()).removeRegion("//");
-                                final ProtectedRegion selected = new ProtectedCuboidRegion("//", pos1, pos2);
-                                final ApplicableRegionSet myregions = worldguard.getRegionManager(player.getWorld()).getApplicableRegions(selected);
-                                boolean preprotected = false;
-                                for (@SuppressWarnings("unused")
-                                final ProtectedRegion current : myregions) {
-                                    preprotected = true;
-                                }
-                                if (preprotected) {
-                                    MainUtil.sendMessage(player, MainUtil.getMessage("MSG16"));
-                                }
-                                else {
-                                    final double area = (pos1.getX() - pos2.getX()) * (pos1.getZ() - pos2.getZ());
-                                    if (area > WorldeditRegions.config.getDouble("max-claim-area")) {
-                                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG18") + "&7 - " + area + " &c>&7 " + WorldeditRegions.config.getDouble("max-claim-area"));
-                                    }
-                                    else {
-                                        try {
-                                            player.setOp(true);
-                                            ProtectedRegion myregion = worldguard.getRegionManager(player.getWorld()).getRegion(player.getName());
-                                            if (myregion == null) {
-                                                if (WorldeditRegions.config.getBoolean("create.expand-vert")) {
-                                                    Bukkit.dispatchCommand(player, "/expand vert");
-                                                }
-                                                if (WorldeditRegions.config.getBoolean("create.add-owner")) {
-                                                    Bukkit.dispatchCommand(player, "region define " + player.getName() + " " + player.getName());
-                                                }
-                                                else {
-                                                    Bukkit.dispatchCommand(player, "region define " + player.getName());
-                                                }
-                                                return true;
-                                            }
-                                            else {
-                                                if (WorldeditRegions.config.getBoolean("create.expand-vert")) {
-                                                    Bukkit.dispatchCommand(player, "/expand vert");
-                                                }
-                                                final int max = (WorldeditRegions.config.getInt("max-region-count-per-player"));
-                                                for (int i = 0; i < (max - 1); i++) {
-                                                    myregion = worldguard.getRegionManager(player.getWorld()).getRegion(player.getName() + "//" + i);
-                                                    if (myregion == null) {
-                                                        if (WorldeditRegions.config.getBoolean("create.expand-vert")) {
-                                                            Bukkit.dispatchCommand(player, "/expand vert");
-                                                        }
-                                                        Bukkit.dispatchCommand(player, "region define " + player.getName() + "//" + i);
-                                                        Bukkit.dispatchCommand(player, "region addowner " + player.getName() + "//" + i + " " + player.getName());
-                                                        return true;
-                                                    }
-                                                }
-                                                MainUtil.sendMessage(player, "&c" + player.getName() + "&7 " + MainUtil.getMessage("MSG14"));
-                                            }
-                                        }
-                                        catch (final Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                        finally {
-                                            player.setOp(false);
-                                        }
-                                    }
-
-                                }
-                                worldguard.getRegionManager(player.getWorld()).removeRegion("//");
-                            }
-                            else {
-                                MainUtil.sendMessage(player, MainUtil.getMessage("MSG17"));
-                            }
-                            return false;
-                        }
-                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG4") + " &cworldguard.region.define.own");
-                    }
-                    return false;
+                case "create": {
+                    return Create.execute(player, args);
                 }
-                else if (args[0].equalsIgnoreCase("help")) {
-                    MainUtil.sendMessage(player, MainUtil.getMessage("MSG7"));
-                    return true;
+                case "help": {
+                    return Help.execute(player, args);
                 }
-                else if (args[0].equalsIgnoreCase("remove")) {
-                    if (RegionHandler.lastmask.get(player.getName()) == null) {
-                        MainUtil.sendMessage(player, MainUtil.getMessage("MSG1"));
-                        if (MainUtil.hasPermission(player, "worldguard.region.remove.*")) {
-                            MainUtil.sendMessage(player, MainUtil.getMessage("MSG9"));
-                        }
-                    }
-                    else {
-                        if (MainUtil.hasPermission(player, "worldguard.region.remove.own.*")) {
-                            Bukkit.dispatchCommand(player, "region remove " + RegionHandler.lastmask.get(player.getName()));
-                        }
-                        else {
-                            MainUtil.sendMessage(player, MainUtil.getMessage("MSG4") + " &cworldguard.region.remove.own.*");
-                        }
-                    }
-                    return true;
+                case "remove": {
+                    return Remove.execute(player, args);
                 }
-                else {
-
+                case "sethome": {
+                    return Sethome.execute(player, args);
+                }
+                case "home": {
+                    return Home.execute(player, args);
+                }
+                case "list": {
+                    return ListCmd.execute(player, args);
+                }
+                case "flag": {
+                    return Flag.execute(player, args);
+                }
+                default: {
                     if (args.length == 2) {
                         if (MainUtil.hasPermission(player, "worldguard.region.flag.regions.own." + args[0])) {
                             if (RegionHandler.lastmask.get(player.getName()) == null) {
@@ -416,7 +368,6 @@ public class WorldguardFeature extends AbstractRegion {
                     }
                 }
             }
-            Bukkit.dispatchCommand(player, "wrg help");
         }
         return false;
     }

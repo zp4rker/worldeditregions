@@ -52,6 +52,7 @@ public class RegionHandler {
 
     public static void refreshPlayer(final Player player) {
         if (MainUtil.hasPermission(player, "wrg.bypass")) {
+            RegionHandler.removeMask(player);
             RegionHandler.bypass.add(player.getName());
         }
         else {
