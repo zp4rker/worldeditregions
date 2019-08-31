@@ -1,0 +1,10 @@
+name: WorldeditRegions
+main: com.empcraft.wrg.WorldeditRegions
+author: zp4rker
+version: 1.0.0-DEV
+depend: [WorldEdit]
+softdepend: [WGCustomFlags,Vault,WorldGuard,GriefPrevention,PreciousStones,Towny,Factions,Residence]
+commands:
+  wrg:
+    description: All Worldedit Regions Commands
+    aliases: [worldeditregions,wer,wr]
